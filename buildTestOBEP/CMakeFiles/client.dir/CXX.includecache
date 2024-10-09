@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/student/Bureau/LaboRTI2024_sources/Librairies/socket.h
+
+/home/student/Bureau/LaboRTI2024_sources/client.cpp
+stdio.h
+-
+stdlib.h
+-
+unistd.h
+-
+string.h
+-
+signal.h
+-
+./Librairies/socket.h
+/home/student/Bureau/LaboRTI2024_sources/Librairies/socket.h
+

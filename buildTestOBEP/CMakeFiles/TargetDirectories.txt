@@ -1,0 +1,6 @@
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/edit_cache.dir
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/client.dir
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/rebuild_cache.dir
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/libsocket.dir
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/serveur.dir
+/home/student/Bureau/LaboRTI2024_sources/build/CMakeFiles/libobep.dir

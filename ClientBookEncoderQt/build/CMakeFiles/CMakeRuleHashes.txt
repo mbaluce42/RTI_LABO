@@ -1,0 +1,4 @@
+# Hashes of file build rules.
+0937f7c546cc24ae2d424984b00bf219 CMakeFiles/ClientBookEncoder_autogen
+1294b11dc4b180414636106e13f6cd2e moc_mainwindowclientbookencoder.cpp
+ac88f47f88fa61a9764e17a0d83db70c moc_ui_mainwindowclientbookencoder.cpp
