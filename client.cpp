@@ -4,7 +4,7 @@
 #include <string.h>
 #include <signal.h>
 #include "./Librairies/socket.h"
-int sClient
+int sClient;
 void HandlerSIGINT(int s);
 void Echange(char *requete, char *reponse);
 bool SMOP_Login(const char *user, const char *password);
