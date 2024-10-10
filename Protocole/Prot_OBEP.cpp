@@ -161,7 +161,11 @@ void OBEP_Close()
         close(clientsConnectes[i]);
     }
 }
-void OBEP_GetAuthors(char * reponse,MYSQL *conn);
+void OBEP_GetAuthors(char * reponse,MYSQL *conn)
+{
+    
+
+}
 void OBEP_GetSubjets(char * reponse,MYSQL *conn);
 void OBEP_Add_Author(char * reponse,MYSQL *conn);
 void OBEP_Add_Subject(char * reponse,MYSQL *conn);
