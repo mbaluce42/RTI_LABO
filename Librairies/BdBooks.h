@@ -10,11 +10,17 @@ using namespace std;
 
 int BdBooks_getAuthors(string& result);
 int BdBooks_getSubjets(string& result);
+int bdBooks_getBooks(string& result);
 
 
-void BdBooks_Add_Author(char * reponse);
-void BdBooks_Add_Subject(char * reponse);
-void BdBooks_Add_Book(char * reponse);
+int BdBooks_Add_Author(string& reponse,string nom,string prenom,string date);
+int BdBooks_Remove_Last_Author(string& result);
+
+int BdBooks_Add_Subject(string& reponse,string nom);
+int BdBooks_Remove_Last_Subject(string& reponse);
+
+
+int BdBooks_Add_Book(string& reponse,string author_id,string subject_id,string titre,string isbn,string nbrPage, string stockDisponible, string prix, string anneePublication);
 
 
 #endif

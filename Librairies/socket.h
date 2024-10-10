@@ -1,7 +1,7 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#define TAILLE_BUFFER 10000
+#define TAILLE_BUFFER 1000000
 
 //PAGE 47 TH
 

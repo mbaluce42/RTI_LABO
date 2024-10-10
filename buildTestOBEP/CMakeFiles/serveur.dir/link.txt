@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/serveur.dir/serveur.cpp.o -o serveur  liblibsocket.a liblibobep.a -lpthread 

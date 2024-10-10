@@ -4,12 +4,18 @@
 #include <string.h>
 #include <signal.h>
 #include "./Librairies/socket.h"
+#include <sstream>
+#include <string>
+
+using namespace std;
+
 int sClient;
 void HandlerSIGINT(int s);
 void Echange(char *requete, char *reponse);
 bool SMOP_Login(const char *user, const char *password);
 void SMOP_Logout();
 void SMOP_Operation(char op, int a, int b);
+void SMOP_Op(char* requete);
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -52,8 +58,12 @@ int main(int argc, char *argv[])
         char op;
         printf("Operation (<CTRL-C> four fin) : ");
         fflush(stdin);
-        scanf("%d %c %d", &a, &op, &b); // pas ouf !
-        SMOP_Operation(op, a, b);
+        //scanf("%d %c %d", &a, &op, &b); // pas ouf !
+        //recup le string
+        char str[200];
+        fgets(str, 200, stdin);
+        SMOP_Op(str);
+        //SMOP_Operation(op, a, b);
     }
 }
 //***** Fin de connexion ********************************************
@@ -120,28 +130,84 @@ void SMOP_Operation(char op,int a,int b)
         printf("Erreur: %s\n", ptr);
     }
 }
-//***** Echange de données entre client et serveur ****************** 
-void Echange(char* requete, char* reponse)
+//*******************************************************************
+void SMOP_Op(char* requete)
+{
+    char reponse[4048];
+    // *****Envoi requete + réception réponse **************
+    Echange(requete, reponse);
+    // *****Parsing de la réponse **************************
+    istringstream is(reponse);
+    string TypeRequete;
+    getline(is, TypeRequete, '_'); // skip le type (add, get)
+    if(TypeRequete == "ADD")
+    {
+        getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+
+        string status;
+        string message;
+        getline(is, status, '#');//recupere le status de la requete
+        getline(is, message, '\n'); //recupere le message de la requete
+
+        if(status == "OK")
+        {
+            printf("Pas d'erreur: %s\n", message.c_str());
+        }
+        else
+        {
+            printf("Erreur: %s\n", message.c_str());
+        }
+
+    }
+    else if(TypeRequete == "GET")
+    {
+        getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+        string status;
+        string messages;
+        getline(is, status, '\n');//recupere le status de la requete
+        getline(is, messages, '\n'); //recupere le message de la requete
+        if(status == "OK")
+        {
+            printf("Pas d'erreur: \n" );
+            printf("%s\n", messages.c_str());
+            while (getline(is, messages, '\n'))
+            {
+                printf("%s\n", messages.c_str());
+            }
+            
+        }
+        else
+        {
+            printf("Erreur: %s\n", messages.c_str());
+        }
+
+    }
+
+}
+//***** Echange de données entre client et serveur ******************
+void Echange(char *requete, char *reponse)
 {
     int nbEcrits, nbLus;
-    // ***** Envoi de la requete **************************** 
-    if ((nbEcrits = SendSocket(sClient,requete,strlen(requete))) == -1) {
-    perror("Erreur de Send");
-    close(sClient);
-    exit(1);
+    // ***** Envoi de la requete ****************************
+    if ((nbEcrits = SendSocket(sClient, requete, strlen(requete))) == -1)
+    {
+        perror("Erreur de Send");
+        close(sClient);
+        exit(1);
+    }
+    // ***** Attente de la reponse **************************
+    if ((nbLus = ReceiveSocket(sClient, reponse)) < 0)
+    {
+        perror("Erreur de Receive");
+        close(sClient);
+        exit(1);
+    }
+    if (nbLus == 0)
+    {
+        printf("Serveur arrete, pas de reponse reçue...\n");
+        close(sClient);
+        exit(1);
+    }
+    reponse[nbLus] = 0;
 }
-// ***** Attente de la reponse ************************** 
-if ((nbLus = ReceiveSocket(sClient,reponse)) < 0)
-{
-    perror("Erreur de Receive");
-    close(sClient);
-    exit(1);
-}
-if (nbLus == 0)
-{
-    printf("Serveur arrete, pas de reponse reçue...\n");
-    close(sClient);
-    exit(1);
-}
-reponse[nbLus] = 0;
-}
+

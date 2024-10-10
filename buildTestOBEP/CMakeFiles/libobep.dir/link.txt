@@ -1,2 +1,0 @@
-/usr/bin/ar qc liblibobep.a CMakeFiles/libobep.dir/Protocole/Prot_OBEP.cpp.o
-/usr/bin/ranlib liblibobep.a

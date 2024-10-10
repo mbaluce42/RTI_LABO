@@ -12,11 +12,11 @@ bool OBEP_Logout(const char* user);
 void OBEP_Close();
 int SMOP_Operation(char op,int a,int b);
 
-void OBEP_GetAuthors(char * reponse,MYSQL *conn);
-void OBEP_GetSubjets(char * reponse,MYSQL *conn);
-void OBEP_Add_Author(char * reponse,MYSQL *conn);
-void OBEP_Add_Subject(char * reponse,MYSQL *conn);
-void OBEP_Add_Book(char * reponse,MYSQL *conn);
+/*void OBEP_GetAuthors(string& reponse,MYSQL *conn);
+void OBEP_GetSubjets(string& reponse,MYSQL *conn);
+void OBEP_Add_Author(string& reponse,MYSQL *conn);
+void OBEP_Add_Subject(string& reponse,MYSQL *conn);
+void OBEP_Add_Book(string& reponse,MYSQL *conn);*/
 
 int estPresent(int socketClient);
 int ajouterClient(int socketClient);

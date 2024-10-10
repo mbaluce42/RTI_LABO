@@ -5,9 +5,8 @@
 #include <sstream>
 #include <string>
 #include "../Librairies/socket.h"
+#include "../Librairies/BdBooks.h"
 #include <unistd.h>
-
-//#include "../ClientBookEncoderQt/FichierClient.h"
 
 using namespace std;
 
@@ -64,6 +63,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
     istringstream is(requete);
     string TypeRequete;
     getline(is, TypeRequete, '#');
+    string result;
     if(TypeRequete == "LOGIN")
     {
         string user, password;
@@ -124,7 +124,124 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
         return true;
     }
+    else if(TypeRequete == "GET_AUTHORS")
+    {
+        result="";
+        
+        int res =BdBooks_getAuthors(result);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getAuthors(): %d\n", res);
+            return false;
+        }
+
+    }
+    else if(TypeRequete == "ADD_AUTHOR")
+    {
+        string nom, prenom, date;
+        getline(is, nom, '#');
+        getline(is, prenom, '#');
+        getline(is, date, '\n');
+        result="";
+        int res = BdBooks_Add_Author(result, nom, prenom, date);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_Add_Author(): %d\n", res);
+            return false;
+        }
+
+    }
+    else if(TypeRequete == "GET_SUBJECTS")
+    {
+        result="";
+        int res = BdBooks_getSubjets(result);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getSubjets(): %d\n", res);
+            return false;
+        }
+
+    }
     
+    else if(TypeRequete == "ADD_SUBJECT")
+    {
+        string nom;
+        getline(is, nom, '\n');
+        result="";
+        int res = BdBooks_Add_Subject(result, nom);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_Add_Subject(): %d\n", res);
+            return false;
+        }
+
+    }
+    else if(TypeRequete == "GET_BOOKS")
+    {
+        result="";
+        int res = bdBooks_getBooks(result);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur bdBooks_getBooks(): %d\n", res);
+            return false;
+        }
+
+    }
+    else if(TypeRequete == "ADD_BOOK")
+    {
+        string author_id, subject_id, titre, isbn, nbrPage, stockDisponible, prix, anneePublication;
+        getline(is, author_id, '#');
+        getline(is, subject_id, '#');
+        getline(is, titre, '#');
+        getline(is, isbn, '#');
+        getline(is, nbrPage, '#');
+        getline(is, stockDisponible, '#');
+        getline(is, prix, '#');
+        getline(is, anneePublication, '\n');
+        result="";
+        int res = BdBooks_Add_Book(result, author_id, subject_id, titre, isbn, nbrPage, stockDisponible, prix, anneePublication);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_Add_Book(): %d\n", res);
+            return false;
+        }
+    }
+    
+    else
+    {
+        strcpy(reponse, "ERREUR#KO#Requete inconnue");
+        return true; //normalement doit etre false
+    }
     
 
 }
@@ -132,7 +249,7 @@ bool OBEP_Login(const char* user, const char* password)
 {
     if(strcmp(user, "admin")==0 && strcmp(password, "admin")==0) return true;
     else if(strcmp(user, "mbaya")==0 && strcmp(password, "student1")==0) return true;
-    else if(strcmp(user, "carlisi")==0 && strcmp(password, "student2")==0) return true;
+    else if(strcmp(user, "carlisi")==0 && strcmp(password, "student1")==0) return true;
     else return false;
     
 }
