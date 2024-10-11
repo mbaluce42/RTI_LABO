@@ -68,7 +68,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
     {
         string user, password;
         getline(is, user, '#');
-        getline(is, password, '#');
+        getline(is, password, '\n');
         
         
         if(estPresent(socketClient)>=0)
@@ -81,7 +81,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
             if(OBEP_Login(user.c_str(), password.c_str()))
             {
                 ajouterClient(socketClient);
-                strcpy(reponse, "LOGIN#OK#");
+                strcpy(reponse, "LOGIN#OK#Le client loggé avec succes");
                 printf("Client %s loggé\n", user.c_str());
                 return true;
             }
@@ -97,9 +97,19 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
     }
     else if(TypeRequete == "LOGOUT")
     {
-        retirerClient(socketClient);
-        strcpy(reponse, "LOGOUT#OK#");
-        return false;
+        int res=retirerClient(socketClient);
+        if(res==1)
+        {
+            strcpy(reponse, "LOGOUT#OK#Client deconnecté avec succes");
+            printf("Client avec socket %d deconnecté\n", socketClient);
+            return true;
+        }
+        else
+        {
+            strcpy(reponse, "LOGOUT#KO#Client pas trouve, deconnexion impossible");
+            return false;
+        }
+        
     }
     else if(TypeRequete == "OPER")
     {
@@ -141,6 +151,26 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
 
     }
+    else if(TypeRequete=="GETID_AUTHOR")
+    {
+        string prenom,nom;
+        getline(is, prenom, ' ');
+        getline(is, nom, '\n');
+        result="";
+        int res = BdBooks_getIdAuthor(result, prenom, nom);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getIdAuthor(): %d\n", res);
+            return false;
+        }
+    }
+    
+    
     else if(TypeRequete == "ADD_AUTHOR")
     {
         string nom, prenom, date;
@@ -148,6 +178,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         getline(is, prenom, '#');
         getline(is, date, '\n');
         result="";
+
         int res = BdBooks_Add_Author(result, nom, prenom, date);
         strcpy(reponse, result.c_str());
         if(res==0)
@@ -177,7 +208,24 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
 
     }
-    
+    else if(TypeRequete == "GETID_SUBJECT")
+    {
+        string nom;
+        getline(is, nom, '\n');
+        result="";
+        int res = BdBooks_getIdSubject(result, nom);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getIdSubject(): %d\n", res);
+            return false;
+        }
+
+    }
     else if(TypeRequete == "ADD_SUBJECT")
     {
         string nom;
@@ -243,7 +291,6 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         return true; //normalement doit etre false
     }
     
-
 }
 bool OBEP_Login(const char* user, const char* password)
 {
@@ -278,12 +325,3 @@ void OBEP_Close()
         close(clientsConnectes[i]);
     }
 }
-void OBEP_GetAuthors(char * reponse,MYSQL *conn)
-{
-    
-
-}
-void OBEP_GetSubjets(char * reponse,MYSQL *conn);
-void OBEP_Add_Author(char * reponse,MYSQL *conn);
-void OBEP_Add_Subject(char * reponse,MYSQL *conn);
-void OBEP_Add_Book(char * reponse,MYSQL *conn);

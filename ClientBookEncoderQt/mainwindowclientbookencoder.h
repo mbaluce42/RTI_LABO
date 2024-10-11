@@ -9,6 +9,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindowClientBookEncoder; }
 QT_END_NAMESPACE
 
+
 class MainWindowClientBookEncoder : public QMainWindow
 {
     Q_OBJECT
@@ -53,5 +54,8 @@ private slots:
 
 private:
     Ui::MainWindowClientBookEncoder *ui;
+
+
+
 };
 #endif // MAINWINDOWCLIENTBOOKENCODER_H

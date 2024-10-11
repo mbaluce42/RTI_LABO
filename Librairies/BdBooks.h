@@ -9,7 +9,11 @@ using namespace std;
 
 
 int BdBooks_getAuthors(string& result);
+int BdBooks_getIdAuthor(string& result,string prenom, string nom);
+
 int BdBooks_getSubjets(string& result);
+int BdBooks_getIdSubject(string& result,string nom);
+
 int bdBooks_getBooks(string& result);
 
 

@@ -1,10 +1,29 @@
 #include "mainwindowclientbookencoder.h"
 #include "ui_mainwindowclientbookencoder.h"
+#include <signal.h>
+#include "../Librairies/socket.h"
 #include "unistd.h"
 #include <QInputDialog>
 #include <QMessageBox>
 #include <iostream>
+#include <sstream>
 using namespace std;
+
+
+int sClient=0;
+int IdBook=1;
+
+void HandlerSIGINT(int s) ;
+
+//***** Gestion du protocole SMOP ***********************************
+
+//*******************************************************************
+int OBEP_Op(char* requete, string& resultat);
+   
+//***** Echange de données entre client et serveur ******************
+int Echange(char *requete, char *reponse);
+
+
 
 MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     : QMainWindow(parent)
@@ -41,6 +60,54 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
 
     this->addComboBoxSubjects("Roman");
     this->addComboBoxSubjects("Science-fiction");
+
+
+    // Armement des signaux
+    struct sigaction A;
+    A.sa_flags = 0;
+    sigemptyset(&A.sa_mask);
+    A.sa_handler = HandlerSIGINT;
+    if (sigaction(SIGINT, &A, NULL) == -1)
+    {
+        perror("Erreur de sigaction");
+        exit(1);
+    }
+    // Connexion sur le serveur
+    sClient = ClientSocket("localhost", "5000");
+
+    if (sClient == -1)
+    {
+        perror("Erreur de ClientSocket");
+        exit(1);
+    }
+    printf("Connecte sur le serveur.\n");
+
+    string requette ="GET_AUTHORS#";
+    string reponse;
+    if(OBEP_Op((char*)requette.c_str(),reponse) == -1)
+    {
+        dialogError("Erreur",reponse);
+    }
+    else
+    {
+        dialogMessage("Succès",reponse);
+
+        istringstream is(reponse);
+        string ligne;
+        
+        while (getline(is, ligne, '\n'))
+        {
+            string nom, prenom,id,dateNaiss;
+            getline(is, id, ';');
+            getline(is, nom, ';');
+            getline(is, prenom, ';');
+            getline(is, dateNaiss, '\n');
+
+            addComboBoxAuthors(nom+" "+prenom);
+        }
+
+    }
+    
 }
 
 MainWindowClientBookEncoder::~MainWindowClientBookEncoder() {
@@ -229,18 +296,54 @@ int MainWindowClientBookEncoder::dialogInputInt(const string& title,const string
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///// Fonctions gestion des boutons et items de menu (TO DO) /////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked() {
-    string lastName = this->dialogInputText("Nouvel auteur","Nom ?");
-    string firstName = this->dialogInputText("Nouvel auteur","Prénom ?");
-    string birthDate = this->dialogInputText("Nouvel auteur","Date de naissance (yyyy-mm-dd) ?");
-    cout << "Nom : " << lastName << endl;
-    cout << "Prénom : " << firstName << endl;
-    cout << "Date de naissance : " << birthDate << endl;
+void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked() 
+{
+    string nom = this->dialogInputText("Nouvel auteur","Nom ?");
+    string prenom = this->dialogInputText("Nouvel auteur","Prénom ?");
+    string dateNaiss = this->dialogInputText("Nouvel auteur","Date de naissance (yyyy-mm-dd) ?");
+
+    cout << "Nom de l'auteur : " << nom << endl;
+    cout << "Prénom de l'auteur : " << prenom << endl;
+    cout << "Date de naissance de l'auteur : " << dateNaiss << endl;
+
+    nom[0]=toupper(nom[0]);
+    prenom[0]=toupper(prenom[0]);
+
+    string requette = "ADD_AUTHOR#"+nom+"#"+prenom+"#"+dateNaiss;
+    string resultat;
+    int res=OBEP_Op((char*)(requette.c_str()), resultat);
+    if(res<0)
+    {
+        dialogError("Erreur",resultat);
+    }
+    else
+    {
+        dialogMessage("Succès",resultat);
+
+        this->addComboBoxAuthors(prenom+" "+nom);
+    }
 }
 
-void MainWindowClientBookEncoder::on_pushButtonAddSubject_clicked() {
-    string name = this->dialogInputText("Nouveau sujet","Nom ?");
-    cout << "Nom : " << name << endl;
+void MainWindowClientBookEncoder::on_pushButtonAddSubject_clicked() 
+{
+    string nom;
+    nom= this->dialogInputText("Nouveau sujet","Nom ?");
+    cout << "Nom du sujet : " << nom << endl;
+
+
+    string requette= "ADD_SUBJECT#"+nom;
+    string resultat;
+    int res=OBEP_Op((char*)(requette.c_str()), resultat);
+    if(res<0)
+    {
+        dialogError("Erreur",resultat);
+    }
+    else
+    {
+        dialogMessage("Succès",resultat);
+        this->addComboBoxSubjects(nom);
+    }
+
 }
 
 void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
@@ -253,6 +356,57 @@ void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
 
     cout << "selection auteur = " << this->getSelectionAuthor() << endl;
     cout << "selection sujet  = " << this->getSelectionSubject() << endl;
+    string requette, resultat;
+    string id_author, id_subject;
+
+    string author = this->getSelectionAuthor(); //recup prenom et nom
+    string subject = this->getSelectionSubject();//recup le nom
+    string title = this->getTitle();
+    string isbn = this->getIsbn();
+    int pageCount = this->getPageCount();
+    float price = this->getPrice();
+    int publishYear = this->getPublishYear();
+    int stockQuantity = this->getStockQuantity();
+
+    requette = "GETID_AUTHOR#"+author;
+    if(OBEP_Op((char*)requette.c_str(),resultat)==0)
+    {
+        istringstream is(resultat);
+        string id;
+        getline(is, id, '\n');
+        id_author = id;
+    }
+    else
+    {
+        dialogError("Erreur",resultat);
+        return;
+    }
+
+    requette = "GETID_SUBJECT#"+subject;
+    if(OBEP_Op((char*)requette.c_str(),resultat)==0)
+    {
+        istringstream is(resultat);
+        string id;
+        getline(is, id, '\n');
+        id_subject = id;
+    }
+    else
+    {
+        dialogError("Erreur",resultat);
+        return;
+    }
+
+    requette = "ADD_BOOK#"+id_author+"#"+id_subject+"#"+title+"#"+isbn+"#"+to_string(pageCount)+"#"+to_string(stockQuantity)+"#"+to_string(price)+"#"+to_string(publishYear);
+    if(OBEP_Op((char*)requette.c_str(),resultat)==0)
+    {
+        dialogMessage("Succès",resultat);
+        this->addTupleTableBooks(IdBook,title,author,subject,isbn,pageCount,publishYear,price,stockQuantity);
+        IdBook++;
+    }
+    else
+    {
+        dialogError("Erreur",resultat);
+    }
 }
 
 void MainWindowClientBookEncoder::on_pushButtonClear_clicked() {
@@ -267,13 +421,266 @@ void MainWindowClientBookEncoder::on_pushButtonClear_clicked() {
 void MainWindowClientBookEncoder::on_actionLogin_triggered() {
     string login = this->dialogInputText("Entrée en session","Login ?");
     string password = this->dialogInputText("Entrée en session","Password ?");
-    this->loginOk();
+
+    printf("Tentative de login...\n");
+    string resultat;
+    string requette= "LOGIN#"+login+"#"+password;
+
+    if(OBEP_Op((char*)requette.c_str(),resultat)==0)
+    {
+        dialogMessage("Login",resultat);
+        this->loginOk();
+    }
+    else
+    {
+        dialogError("Erreur de login",resultat);
+    }
+    
 }
 
 void MainWindowClientBookEncoder::on_actionLogout_triggered() {
-    this->logoutOk();
+    
+    string resultat;
+    
+    int res=OBEP_Op("LOGOUT#",resultat);
+    if(res==0)
+    {
+        dialogMessage("Logout",resultat);
+        this->logoutOk();
+    }
+    else
+    {
+        dialogError("Erreur de logout",resultat);
+    }
 }
 
-void MainWindowClientBookEncoder::on_actionQuitter_triggered(){
-    QApplication::exit(0);
+void MainWindowClientBookEncoder::on_actionQuitter_triggered()
+{
+    
+    string resultat;
+    string requette = "LOGOUT#";
+    int res=OBEP_Op((char*)requette.c_str(),resultat);
+    if(res<0)
+    {
+        dialogError("Erreur",resultat);
+    }
+    else
+    {
+        dialogMessage("Succès",resultat);
+        ::close(sClient);
+        QApplication::exit(0);
+    }
+}
+
+
+void HandlerSIGINT(int s) 
+{
+    printf("\nArret du client.\n");
+    string resultat;
+    string requette = "LOGOUT#";
+    int res=OBEP_Op((char*)requette.c_str(),resultat);
+    if(res<0)
+    {
+        printf("Erreur de logout: %s\n", resultat.c_str());
+    }
+    else
+    {
+        printf("Logout: %s\n", resultat.c_str());
+        close(sClient);
+        QApplication::exit(0);
+    }
+    close(sClient);
+    exit(0);
+}
+
+//***** Gestion du protocole SMOP ***********************************
+/*bool OBEP_Login(const char* user,const char* password)
+{
+    char requete[200], reponse[200];
+    bool onContinue = true;
+    // ***** Construction de la requete ********************* 
+    sprintf(requete,"LOGIN#%s#%s",user,password);
+    // ***** Envoi requete + réception réponse ************** 
+    Echange(requete,reponse);
+    // ***** Parsing de la réponse ************************** 
+    char *ptr = strtok(reponse,"#"); // entête = LOGIN (normalement...) 
+    ptr = strtok(NULL,"#"); // statut = ok ou ko
+    if (strcmp(ptr, "ok") == 0 || strcmp(ptr, "OK") == 0)
+        printf("Login OK.\n");
+    else
+    {
+        ptr = strtok(NULL, "#"); // raison du ko
+        printf("Erreur de login: %s\n", ptr);
+        onContinue = false;
+    }
+    return onContinue;
+}*/
+//******************************************************************* 
+/*void OBEP_Logout()
+{
+    char requete[200], reponse[200];
+    int nbEcrits, nbLus;
+    // ***** Construction de la requete ********************* 
+    sprintf(requete,"LOGOUT");
+    // ***** Envoi requete + réception réponse ************** 
+    Echange(requete,reponse);
+    // ***** Parsing de la réponse **************************
+    // pas vraiment utile...
+}*/
+
+//*******************************************************************
+int OBEP_Op(char* requete, string& resultat)
+{
+    char reponse[4048];
+    int res;
+    // *****Envoi requete + réception réponse **************
+    res=Echange(requete, reponse);
+    if(res<0)
+    {
+        return -1;
+    }
+    else
+    {
+        // *****Parsing de la réponse **************************
+        istringstream is(reponse);
+        string TypeRequete;
+        getline(is, TypeRequete, '_'); // skip le type (add, get)
+        if(TypeRequete == "ADD")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+
+            string status;
+            string message;
+            getline(is, status, '#');//recupere le status de la requete
+            getline(is, message, '\n'); //recupere le message de la requete
+            resultat = message;
+            if(status == "OK")
+            {
+                
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else if(TypeRequete == "GET")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages + '\n';
+                while (getline(is, messages, '\n'))
+                {
+                    resultat += messages;
+                    resultat += '\n';
+                }
+                
+            }
+            else
+            {
+                
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+        else if(TypeRequete=="GETID")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages;
+            }
+            else
+            {
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+        else
+        {
+            istringstream is(reponse);
+            string TypeRequete;
+            getline(is, TypeRequete, '#'); // skip le type (Author, Subject, Book)
+            
+            if(TypeRequete == "LOGIN")
+            {
+                string status;
+                getline(is, status, '#');
+                string message;
+                getline(is, message, '\n');
+                resultat=message;
+                if(status == "OK")
+                {
+                
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else if(TypeRequete == "LOGOUT")
+            {
+                string status;
+                getline(is, status, '#');
+                string message;
+                getline(is, message, '\n');
+                resultat=message;
+                if(status == "OK")
+                {
+                
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
+
+    }
+
+    return 0;
+}
+//***** Echange de données entre client et serveur ******************
+int Echange(char *requete, char *reponse)
+{
+    int nbEcrits, nbLus;
+    // ***** Envoi de la requete ****************************
+    if ((nbEcrits = SendSocket(sClient, requete, strlen(requete))) == -1)
+    {
+        perror("Erreur de Send");
+        close(sClient);
+        return -1;
+    }
+    // ***** Attente de la reponse **************************
+    if ((nbLus = ReceiveSocket(sClient, reponse)) < 0)
+    {
+        perror("Erreur de Receive");
+        close(sClient);
+        return -2;
+    }
+    if (nbLus == 0)
+    {
+        printf("Serveur arrete, pas de reponse reçue...\n");
+        close(sClient);
+        return -3;
+    }
+    reponse[nbLus] = 0;
+
+    return 0;
 }
