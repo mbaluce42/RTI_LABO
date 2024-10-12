@@ -6,45 +6,33 @@
 
 #IncludeRegexTransform: 
 
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/build/ClientBookEncoder_autogen/mocs_compilation.cpp
-
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/build/moc_mainwindowclientbookencoder.cpp
-../mainwindowclientbookencoder.h
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/mainwindowclientbookencoder.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/build/moc_ui_mainwindowclientbookencoder.cpp
-
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/main.cpp
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/mainwindowclientbookencoder.cpp
 mainwindowclientbookencoder.h
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/mainwindowclientbookencoder.h
-QApplication
--
-
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/mainwindowclientbookencoder.cpp
-mainwindowclientbookencoder.h
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/mainwindowclientbookencoder.h
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/mainwindowclientbookencoder.h
 ui_mainwindowclientbookencoder.h
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/ui_mainwindowclientbookencoder.h
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/ui_mainwindowclientbookencoder.h
+signal.h
+-
+../Librairies/socket.h
+/home/student/Bureau/RTI_LABO/Librairies/socket.h
 unistd.h
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/unistd.h
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/unistd.h
 QInputDialog
 -
 QMessageBox
 -
 iostream
 -
+sstream
+-
 
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/mainwindowclientbookencoder.h
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/mainwindowclientbookencoder.h
 QMainWindow
 -
 string
 -
 
-/home/student/Bureau/LaboRTI2024_sources/ClientBookEncoderQt/ui_mainwindowclientbookencoder.h
+/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/ui_mainwindowclientbookencoder.h
 QtCore/QVariant
 -
 QtWidgets/QAction
@@ -77,6 +65,8 @@ QtWidgets/QTableWidget
 -
 QtWidgets/QWidget
 -
+
+/home/student/Bureau/RTI_LABO/Librairies/socket.h
 
 /usr/include/qt5/QtCore/QVariant
 qvariant.h

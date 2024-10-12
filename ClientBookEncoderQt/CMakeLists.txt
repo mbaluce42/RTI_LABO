@@ -16,12 +16,14 @@ set(SOURCES
     main.cpp
     mainwindowclientbookencoder.cpp
     moc_mainwindowclientbookencoder.cpp
+    ../Librairies/socket.cpp
 )
 
 # Ajouter les fichiers d'en-tête
 set(HEADERS
     mainwindowclientbookencoder.h
     ui_mainwindowclientbookencoder.h  # Ajouter l'en-tête généré
+    ../Librairies/socket.h
 )
 
 # Générer automatiquement le code MOC pour les classes qui utilisent Qt

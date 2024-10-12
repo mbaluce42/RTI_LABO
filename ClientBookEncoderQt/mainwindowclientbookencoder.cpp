@@ -8,7 +8,8 @@
 #include <iostream>
 #include <sstream>
 using namespace std;
-
+string portServeur="50000";
+string ipServeur="127.0.0.1";
 
 int sClient=0;
 int IdBook=1;
@@ -51,7 +52,7 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     this->logoutOk();
 
     // Exemples d'utilisation (à supprimer)
-    this->addTupleTableBooks(1,"Les Thanatonautes","Bernard Werber","Science-Fiction","978-2253139225",505,1999,9.7f,3);
+    /*this->addTupleTableBooks(1,"Les Thanatonautes","Bernard Werber","Science-Fiction","978-2253139225",505,1999,9.7f,3);
     this->addTupleTableBooks(6,"Dune","Frank Herbert","Science-Fiction","978-2266320481",929,2021,11.95f,13);
     this->addTupleTableBooks(13,"Le silence des agneaux","Thomas Harris","Thriller","978-2266208949",377,2015,7.7f,17);
 
@@ -59,7 +60,7 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     this->addComboBoxAuthors("Dan Brown");
 
     this->addComboBoxSubjects("Roman");
-    this->addComboBoxSubjects("Science-fiction");
+    this->addComboBoxSubjects("Science-fiction");*/
 
 
     // Armement des signaux
@@ -70,13 +71,16 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     if (sigaction(SIGINT, &A, NULL) == -1)
     {
         perror("Erreur de sigaction");
+        printf("Arret du client.\n");
         exit(1);
     }
     // Connexion sur le serveur
-    sClient = ClientSocket("localhost", "5000");
+
+    sClient = ClientSocket((char*)ipServeur.c_str(), (char*)portServeur.c_str());
 
     if (sClient == -1)
     {
+        printf("Erreur de ClientSocket\n");
         perror("Erreur de ClientSocket");
         exit(1);
     }
@@ -97,15 +101,40 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
         
         while (getline(is, ligne, '\n'))
         {
-            string nom, prenom,id,dateNaiss;
-            getline(is, id, ';');
-            getline(is, nom, ';');
-            getline(is, prenom, ';');
-            getline(is, dateNaiss, '\n');
+            istringstream is2(ligne);
+            string id, nom, prenom, date;
+            getline(is2, id, ';');
+            getline(is2, nom, ';');
+            getline(is2, prenom, ';');
+            getline(is2, date, '\n');
 
             addComboBoxAuthors(nom+" "+prenom);
         }
+    }
 
+
+    requette ="GET_SUBJECTS#";
+    if(OBEP_Op((char*)requette.c_str(),reponse) == -1)
+    {
+        dialogError("Erreur",reponse);
+    }
+    else
+    {
+        dialogMessage("Succès",reponse);
+
+        istringstream is(reponse);
+        string ligne;
+        printf("Reponse: %s\n", reponse.c_str());
+        
+        while (getline(is, ligne, '\n'))
+        {
+            istringstream is2(ligne);
+            string id, nom;
+            getline(is2, id, ';');
+            getline(is2, nom, '\n');
+
+            addComboBoxSubjects(nom);
+        }
     }
     
 }
@@ -442,7 +471,7 @@ void MainWindowClientBookEncoder::on_actionLogout_triggered() {
     
     string resultat;
     
-    int res=OBEP_Op("LOGOUT#",resultat);
+    int res=OBEP_Op((char*)"LOGOUT#",resultat);
     if(res==0)
     {
         dialogMessage("Logout",resultat);

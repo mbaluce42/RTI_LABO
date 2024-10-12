@@ -3,6 +3,11 @@
 
 CMakeFiles/ClientBookEncoder.dir/ClientBookEncoder_autogen/mocs_compilation.cpp.o: ClientBookEncoder_autogen/mocs_compilation.cpp
 
+CMakeFiles/ClientBookEncoder.dir/__/Librairies/moc_socket.cpp.o: __/Librairies/moc_socket.cpp
+
+CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o: /home/student/Bureau/RTI_LABO/Librairies/socket.cpp
+CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o: /home/student/Bureau/RTI_LABO/Librairies/socket.h
+
 CMakeFiles/ClientBookEncoder.dir/main.cpp.o: ../main.cpp
 CMakeFiles/ClientBookEncoder.dir/main.cpp.o: ../mainwindowclientbookencoder.h
 CMakeFiles/ClientBookEncoder.dir/main.cpp.o: /usr/include/qt5/QtCore/qalgorithms.h
@@ -123,6 +128,7 @@ CMakeFiles/ClientBookEncoder.dir/main.cpp.o: /usr/include/qt5/QtWidgets/qwidget.
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: ../mainwindowclientbookencoder.cpp
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: ../mainwindowclientbookencoder.h
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: ../ui_mainwindowclientbookencoder.h
+CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: /home/student/Bureau/RTI_LABO/Librairies/socket.h
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/QVariant
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/qabstractitemmodel.h
 CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o: /usr/include/qt5/QtCore/qalgorithms.h
