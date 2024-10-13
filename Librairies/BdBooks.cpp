@@ -929,7 +929,7 @@ int BdBooks_Add_Employee(string& reponse,string login,string password)
             return -1;
         }
     }
-    //verif si password est bien un password
+    //verif si password est compose de lettres et de chiffres
     for(int i=0; i<password.length(); i++)
     {
         if(!isalnum(password[i]))

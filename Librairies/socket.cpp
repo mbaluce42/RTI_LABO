@@ -7,6 +7,9 @@
 #include <netdb.h>
 #include <cstring>
 #include <arpa/inet.h>
+#include <string>
+
+using namespace std;
 
 /*fait un appel à socket() pour créer la socket
 o construit l’adresse réseau de la socket par appel à getaddrinfo()
@@ -163,6 +166,7 @@ int SendSocket(int sSocket, char *buffer,int taille)
 
 }
 
+
 int ReceiveSocket(int socket, char *buffer)
 {
     int nbOctets;
@@ -173,6 +177,51 @@ int ReceiveSocket(int socket, char *buffer)
         perror("recv");
         return -1;
     }
+
+    return nbOctets;
+}
+
+
+int SendSocket(int sSocket, string &buffer)
+{
+    int nbOctets = 0;
+    size_t totalEnvoyes = 0;
+    size_t tailleMessage = buffer.size();
+
+    // Boucle pour s'assurer que tous les octets sont envoyés
+    while (totalEnvoyes < tailleMessage) {
+        nbOctets = send(sSocket, buffer.c_str() + totalEnvoyes, tailleMessage - totalEnvoyes, 0);
+        if (nbOctets == -1) {
+            perror("Erreur lors de l'envoi (send)");
+            return -1;
+        }
+        totalEnvoyes += nbOctets;
+    }
+
+    return totalEnvoyes;
+}
+
+int ReceiveSocket(int socket, string &buffer)
+{
+    char bufferChar[TAILLE_BUFFER];
+    int nbOctets;
+
+    // Réinitialiser le buffer avant de recevoir des données
+    memset(bufferChar, 0, TAILLE_BUFFER);
+
+    // Réception du message
+    nbOctets = recv(socket, bufferChar, TAILLE_BUFFER - 1, 0); // Laisser de la place pour '\0'
+    if (nbOctets == -1) {
+        perror("Erreur lors de la réception (recv)");
+        return -1;
+    } else if (nbOctets == 0) {
+        // Le client a fermé la connexion
+        printf("Le client a fermé la connexion\n");
+        return 0;
+    }
+
+    // Convertir en string le buffer reçu
+    buffer.assign(bufferChar, nbOctets);  // Convertir uniquement les octets reçus
 
     return nbOctets;
 }

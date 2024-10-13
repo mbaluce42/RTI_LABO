@@ -1,7 +1,10 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#define TAILLE_BUFFER 1000000
+#include <string>
+#define TAILLE_BUFFER 4096
+
+using namespace std;
 
 //PAGE 47 TH
 
@@ -53,6 +56,7 @@ int AcceptSocket(int sEcoute, char *ipClient);
  */
 int SendSocket(int sSocket, char *buffer,int taille);
 
+int SendSocket(int sSocket, string& buffer);
 
 /*Explication fct ReceiveSocket() */
 /* Cette fonction permet de recevoir un message sur un socket
@@ -61,5 +65,6 @@ int SendSocket(int sSocket, char *buffer,int taille);
  * Elle retourne un entier qui est le nombre d'octets reçus
  */
 int ReceiveSocket(int socket, char *buffer);
+int ReceiveSocket(int socket, string &buffer);
 
 #endif

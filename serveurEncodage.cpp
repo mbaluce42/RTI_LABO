@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include "./Librairies/socket.h"
 #include "./Protocole/Prot_OBEP.h"
+#include <string>
+using namespace std;
 
 #define MAX_THREADS 100
 #define CONFIG_FILE "server_config.txt"
@@ -128,7 +130,8 @@ void HandlerSIGINT(int s) {
 }
 
 void TraitementConnexion(int sService) {
-    char requete[200], reponse[4048];
+    //char reponse[4048], requete[4048];
+    string reponse , requete;
     int nbLus, nbEcrits;
     bool onContinue = true;
     while (onContinue) 
@@ -143,17 +146,19 @@ void TraitementConnexion(int sService) {
             close(sService);
             return;
         }
-        requete[nbLus] = 0;
-        printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
+        //requete[nbLus] = 0; 
+        //printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
+        printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete.c_str());
         // ***** Traitement de la requete ***********
         onContinue = OBEP_Parser(requete, reponse, sService);
         // ***** Envoi de la reponse ****************
-        if ((nbEcrits = SendSocket(sService, reponse, strlen(reponse))) < 0) {
+        if ((nbEcrits = SendSocket(sService, reponse)) == -1){
             perror("Erreur de Send");
             close(sService);
             return;
         }
-        printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse);
+        //printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse);
+        printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse.c_str());
 
         //if (!onContinue)
         //    printf("\t[THREAD %p] Fin de connexion de la socket %d\n", pthread_self(), sService);

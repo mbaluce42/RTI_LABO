@@ -6,16 +6,19 @@
 #include "./Librairies/socket.h"
 #include <sstream>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
 int sClient;
 void HandlerSIGINT(int s);
 int Echange(char *requete, char *reponse);
+int Echange(string requete, string& reponse);
 bool OBEP_Login(const char *user, const char *password);
 void OBEP_Logout();
 void SMOP_Operation(char op, int a, int b);
-int OBEP_Op(char* requete, string& resultat);
+//int OBEP_Op(char* requete, string& resultat);
+int OBEP_Op(string requete, string& resultat);
 int main(int argc, char *argv[])
 {
     if (argc != 3)
@@ -57,16 +60,19 @@ int main(int argc, char *argv[])
         int a, b;
         char op;
         printf("Operation (<CTRL-C> four fin) : ");
-        fflush(stdin);
-        //scanf("%d %c %d", &a, &op, &b); // pas ouf !
         //recup le string
-        char str[200];
-        fgets(str, 200, stdin);
-        string resultat;
-        int res;
-        res=OBEP_Op(str, resultat);
-        printf("Code retour: %d\n", res);
-        printf("Resultat requette:\n %s\n", resultat.c_str());
+        string operation;
+        getline(cin, operation, '\n');
+
+        int res = OBEP_Op(operation, operation);
+        if (res == 0)
+        {
+            printf("Reponse: %s\n", operation.c_str());
+        }
+        else
+        {
+            printf("Erreur: %s\n", operation.c_str());
+        }
 
         //SMOP_Operation(op, a, b);
     }
@@ -263,11 +269,13 @@ void OBEP_Logout()
 }
 
 //*******************************************************************
-int OBEP_Op(char* requete, string& resultat)
+int OBEP_Op(string requete, string& resultat)
 {
-    char reponse[4048];
+    //char reponse[4048];
+    string reponse;
     int res;
     // *****Envoi requete + réception réponse **************
+    //res=Echange(requete, reponse);
     res=Echange(requete, reponse);
     if(res<0)
     {
@@ -426,6 +434,35 @@ int Echange(char *requete, char *reponse)
         return -3;
     }
     reponse[nbLus] = 0;
+
+    return 0;
+}
+
+
+int Echange(string requete, string& reponse)
+{
+
+    int nbEcrits, nbLus;
+    // ***** Envoi de la requete ****************************
+    if ((nbEcrits = SendSocket(sClient, requete)) == -1)
+    {
+        perror("Erreur de Send");
+        close(sClient);
+        return -1;
+    }
+    // ***** Attente de la reponse **************************
+    if ((nbLus = ReceiveSocket(sClient, reponse)) < 0)
+    {
+        perror("Erreur de Receive");
+        close(sClient);
+        return -2;
+    }
+    if (nbLus == 0)
+    {
+        printf("Serveur arrete, pas de reponse reçue...\n");
+        close(sClient);
+        return -3;
+    }
 
     return 0;
 }
