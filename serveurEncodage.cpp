@@ -34,7 +34,7 @@ void read_config()
         perror("Erreur d'ouverture du fichier de configuration");
         //exit(1);
         PORT_ENCODING= 50000;
-        NB_THREADS= 5;
+        NB_THREADS= 2;
         return;
     }
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         printf("Connexion acceptée : IP=%s socket=%d\n", ipClient, sService);
-
+        printf("Taille de la queue avant ajout : %d\n", queue_size);
         pthread_mutex_lock(&mutex_pool);
         if (queue_size < NB_THREADS) {
             clients_queue[queue_pos] = sService;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
             queue_size++;
             pthread_cond_signal(&cond_pool);
         } else {
-            printf("File d'attente pleine, connexion refusée\n");
+            printf("\nFile d'attente pleine, connexion refusée\n");
             close(sService);
         }
         pthread_mutex_unlock(&mutex_pool);
@@ -139,7 +139,7 @@ void TraitementConnexion(int sService) {
         {   
             // ***** Fin de connexion ? *****************
             if (nbLus < 0) perror("Erreur de Receive");
-            printf("\t[THREAD %p] Fin de connexion du client.\n", pthread_self());
+            printf("\t[THREAD %p] Fin de connexion du client averc la socket %d\n", pthread_self(), sService);
             close(sService);
             return;
         }
@@ -155,8 +155,8 @@ void TraitementConnexion(int sService) {
         }
         printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse);
 
-        if (!onContinue)
-            printf("\t[THREAD %p] Fin de connexion de la socket %d\n", pthread_self(), sService);
+        //if (!onContinue)
+        //    printf("\t[THREAD %p] Fin de connexion de la socket %d\n", pthread_self(), sService);
     }
     close(sService);
 }

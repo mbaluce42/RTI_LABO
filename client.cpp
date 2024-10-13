@@ -384,9 +384,20 @@ int OBEP_Op(char* requete, string& resultat)
                     return -1;
                 }
             }
+            else //erreur
+            {
+                string status;
+                getline(is, status, '#');
+                string message;
+                getline(is, message, '\n');
+                resultat=message;
+                return -1;
+            }
         }
 
     }
+
+    printf("Reponse OBEP(return 0): %s\n", resultat.c_str());
 
     return 0;
 }

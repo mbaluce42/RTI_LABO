@@ -306,6 +306,244 @@ int bdBooks_getBooks(string& result)
     return 0;
 }
 
+int bdBooks_getIdBook(string& result,string titre)
+{
+    if(titre.empty())
+    {
+        result="GETID_BOOK#KO#Titre du livre vide (doit etre GETID_BOOK#titreLivre)";
+        return -1;
+    }
+
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GETID_BOOK#KO#Connexion a la BD impossible";
+        return -1; //"ERROR BD";
+    }
+    printf("(GetIdBook)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT id FROM books WHERE LOWER(title) = LOWER('"+titre+"')";
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GETID_BOOK#KO#Requete SELECT impossible";
+        return -2;//"ERROR REQUETE";
+    }
+
+    printf("(GetIdBook)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GETID_BOOK#KO#Recuperation des resultats impossible";
+        return -3;//"ERROR RECUP RESULTAT";
+    }
+    printf("(GetIdBook)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    ligne=mysql_fetch_row(resultat);
+    if(ligne==NULL)
+    {
+        result="GETID_BOOK#KO#Livre non trouve (doit etre GETID_BOOK#titreLivre)";
+        return -4;
+    }
+    ostringstream ossResultat;
+    ossResultat<< "GETID_BOOK#OK" <<'\n';
+    ossResultat << ligne[0] << '\n';
+    printf("\n(GetIdBook)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+
+    return 0;
+}
+
+int BdBooks_getIdEmployee(string& result,string login)
+{
+    if(login.empty())
+    {
+        result="GETID_EMPLOYEE#KO#Login de l'employe vide (doit etre GETID_EMPLOYEE#loginEmployee)";
+        return -1;
+    }
+
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GETID_EMPLOYEE#KO#Connexion a la BD impossible";
+        return -1; //"ERROR BD";
+    }
+    printf("(GetIdEmployee)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT id FROM employees WHERE LOWER(login) = LOWER('"+login+"')";
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GETID_EMPLOYEE#KO#Requete SELECT impossible";
+        return -2;//"ERROR REQUETE";
+    }
+
+    printf("(GetIdEmployee)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GETID_EMPLOYEE#KO#Recuperation des resultats impossible";
+        return -3;//"ERROR RECUP RESULTAT";
+    }
+    printf("(GetIdEmployee)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    ligne=mysql_fetch_row(resultat);
+    if(ligne==NULL)
+    {
+        result="GETID_EMPLOYEE#KO#Employe non trouve (doit etre GETID_EMPLOYEE#loginEmployee)";
+        return -4;
+    }
+    ostringstream ossResultat;
+    ossResultat<< "GETID_EMPLOYEE#OK" <<'\n';
+    ossResultat << ligne[0] << '\n';
+    printf("\n(GetIdEmployee)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+
+    return 0;
+}
+
+int BdBooks_getEncodedBooks(string& result)
+{
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GET_ENCODED_BOOKS#KO#Connexion a la BD impossible";
+        return -1; //"ERROR BD";
+    }
+    printf("(GetEncodedBooks)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT * FROM encoded_books";
+
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GET_ENCODED_BOOKS#KO#Requete SELECT impossible";
+        return -2;//"ERROR REQUETE";
+    }
+
+    printf("(GetEncodedBooks)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GET_ENCODED_BOOKS#KO#Recuperation des resultats impossible";
+        return -3;//"ERROR RECUP RESULTAT";
+    }
+    printf("(GetEncodedBooks)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    int nbrChamps = mysql_num_fields(resultat); //nombre de colonnes
+    ostringstream ossResultat;
+    ossResultat<< "GET_ENCODED_BOOKS#OK" <<'\n';
+
+    while((ligne=mysql_fetch_row(resultat))!=NULL)
+    {
+        for(int i=0; i<nbrChamps; i++)
+        {
+            ossResultat << ligne[i];
+            if(i<nbrChamps-1)
+            {
+                ossResultat<< ";";
+            }    
+        }
+        ossResultat << '\n';
+    }
+    printf("\n(GetEncodedBooks)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+    return 0;
+}
+
+int BdBooks_getEmployees(string& result)
+{
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GET_EMPLOYEES#KO#Connexion a la BD impossible";
+        return -1; //"ERROR BD";
+    }
+    printf("(GetEmployees)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT * FROM employees";
+
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GET_EMPLOYEES#KO#Requete SELECT impossible";
+        return -2;//"ERROR REQUETE";
+    }
+
+    printf("(GetEmployees)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GET_EMPLOYEES#KO#Recuperation des resultats impossible";
+        return -3;//"ERROR RECUP RESULTAT";
+    }
+    printf("(GetEmployees)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    int nbrChamps = mysql_num_fields(resultat); //nombre de colonnes
+    ostringstream ossResultat;
+    ossResultat<< "GET_EMPLOYEES#OK" <<'\n';
+
+    while((ligne=mysql_fetch_row(resultat))!=NULL)
+    {
+        for(int i=0; i<nbrChamps; i++)
+        {
+            ossResultat << ligne[i];
+            if(i<nbrChamps-1)
+            {
+                ossResultat<< ";";
+            }    
+        }
+        ossResultat << '\n';
+    }
+    printf("\n(GetEmployees)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+
+    return 0;
+}
+
+
 int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
 {
     if(nom.empty() || prenom.empty() || date.empty())
@@ -346,8 +584,9 @@ int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
 
     printf("(AddAuthor)Connexion reussie vers la BD\n");
 
+    
     // Vérification si l'auteur existe déjà
-    string requete_verif = "SELECT id FROM authors WHERE last_name = '" + nom + 
+    /*string requete_verif = "SELECT id FROM authors WHERE last_name = '" + nom + 
                            "' AND first_name = '" + prenom + "' AND birth_date = '" + date + "'";
     
     if (mysql_query(connexion, requete_verif.c_str()))
@@ -374,7 +613,16 @@ int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
         return -1;
     }
 
-    mysql_free_result(res);
+    mysql_free_result(res);*/
+
+    int res=BdBooks_getIdAuthor(result, prenom, nom);
+    if(res==0)
+    {
+        result="ADD_AUTHOR#KO#L'auteur existe deja";
+        return -1;
+    }
+
+    
 
     // Insertion de l'auteur
     string requete = "INSERT INTO authors (last_name, first_name, birth_date) VALUES ('" +
@@ -432,7 +680,7 @@ int BdBooks_Add_Subject(string& result,string nom)
     printf("(AddSubject)Connexion reussie vers la BD\n");
 
     // Vérification si le sujet existe déjà
-    string requete_verif = "SELECT id FROM subjects WHERE name = '" + nom + "'";
+    /*string requete_verif = "SELECT id FROM subjects WHERE name = '" + nom + "'";
     
     if (mysql_query(connexion, requete_verif.c_str()))
     {
@@ -458,7 +706,14 @@ int BdBooks_Add_Subject(string& result,string nom)
         return -1; 
     }
 
-    mysql_free_result(res);
+    mysql_free_result(res);*/
+
+    int res=BdBooks_getIdSubject(result, nom);
+    if(res==0)
+    {
+        result="ADD_SUBJECT#KO#Le sujet existe deja";
+        return -1;
+    }
 
     // Insertion du sujet
     string requete = "INSERT INTO subjects (name) VALUES ('" + nom + "')";
@@ -521,20 +776,6 @@ int BdBooks_Add_Book(string& reponse,string author_id,string subject_id,string t
             return -1;
         }
     }
-    //verif si prix est bien un nombre a virgule ou entier (ex: 12.5 ou 12)
-    int point=0;
-    for(int i=0; i<prix.length(); i++)
-    {
-        if(!isdigit(prix[i]) && prix[i]!='.') 
-        {
-            reponse="ADD_BOOK#KO#prix incorrect (doit etre un nombre)";
-            return -1;
-        }
-        if(prix[i]=='.')
-        {
-            point++;
-        }
-    }
 
     for(int i=0; i<anneePublication.length(); i++)
     {
@@ -545,31 +786,31 @@ int BdBooks_Add_Book(string& reponse,string author_id,string subject_id,string t
         }
     }
     //verif si isbn est bien formaté exemple: 978-2123456803
-    if(isbn.length()!=13)
+    if(isbn.length()!=14) //
     {
-        reponse="ADD_BOOK#KO#isbn incorrect (doit etre de la forme 978-2123456803)";
+        reponse="ADD_BOOK#KO#isbn incorrect le format doit etre compose de 14 caracteres (exemple 978-2123456803)";
         return -1;
     }
     else
     {
-        if(isbn[3]!='-' || isbn[12]!='-')
+        if(isbn[3]!='-')
         {
-            reponse="ADD_BOOK#KO#isbn incorrect (doit etre de la forme 978-2123456803)";
+            reponse="ADD_BOOK#KO#isbn incorrect le format doit etre compose de 3 chiffres (exemple 978-2123456803)";
             return -1;
         }
         for(int i=0; i<3; i++)
         {
             if(!isdigit(isbn[i]))
             {
-                reponse="ADD_BOOK#KO#isbn incorrect (doit etre de la forme 978-2123456803)";
+                reponse="ADD_BOOK#KO#isbn incorrect le format avant le tiret doit etre compose de 3 chiffres (exemple 978-2123456803)";
                 return -1;
             }
         }
-        for(int i=4; i<12; i++)
+        for(int i=4; i<14; i++)
         {
             if(!isdigit(isbn[i]))
             {
-                reponse="ADD_BOOK#KO#isbn incorrect (doit etre de la forme 978-2123456803)";
+                reponse="ADD_BOOK#KO#isbn incorrect le format apres le tiret doit etre compose de 10 chiffres (exemple 978-2123456803)";
                 return -1;
             }
         }
@@ -670,3 +911,222 @@ int BdBooks_Add_Book(string& reponse,string author_id,string subject_id,string t
     reponse = "ADD_BOOK#OK#Le livre a ete ajoute avec succes";
     return 0;
 }
+
+int BdBooks_Add_Employee(string& reponse,string login,string password)
+{
+    //verifs
+    if(login.empty() || password.empty())
+    {
+        reponse="ADD_EMPLOYEE#KO#Un ou plusieurs champs vides (doit etre ADD_EMPLOYEE#login#password)";
+        return -1;
+    }
+    //verif si login est bien un login
+    for(int i=0; i<login.length(); i++)
+    {
+        if(!isalnum(login[i]))
+        {
+            reponse="ADD_EMPLOYEE#KO#login incorrect (doit etre compose de lettres et de chiffres)";
+            return -1;
+        }
+    }
+    //verif si password est bien un password
+    for(int i=0; i<password.length(); i++)
+    {
+        if(!isalnum(password[i]))
+        {
+            reponse="ADD_EMPLOYEE#KO#password incorrect (doit etre compose de lettres et de chiffres)";
+            return -1;
+        }
+    }
+
+    MYSQL *connexion ;
+    connexion=mysql_init(NULL);
+
+
+    if (mysql_real_connect(connexion, "localhost", "Student", "PassStudent1_", "PourStudent", 0, NULL, 0) == NULL)
+    {
+        reponse = "ADD_EMPLOYEE#KO#Connexion a la BD impossible";
+        mysql_close(connexion);
+        return -2;
+    }
+
+    printf("(AddEmployee)Connexion reussie vers la BD\n");
+
+    // Vérification si l'employé existe déjà
+    /*string requete_verif = "SELECT id FROM employees WHERE login = '" + login + "'";
+
+    if (mysql_query(connexion, requete_verif.c_str()))
+    {
+        reponse = "ADD_EMPLOYEE#KO#Verification de l'existence de l'employe impossible";
+        mysql_close(connexion);
+        return -3;
+    }
+
+    MYSQL_RES *res = mysql_store_result(connexion);
+    if (res == NULL)
+    {
+        reponse = "ADD_EMPLOYEE#KO#Erreur lors de la récupération du résultat";
+        mysql_close(connexion);
+        return -4;
+    }
+
+    MYSQL_ROW ligne = mysql_fetch_row(res);
+    if (ligne!=NULL)
+    {
+        reponse = "ADD_EMPLOYEE#KO#L'employe existe deja";
+        mysql_free_result(res);
+        mysql_close(connexion);
+        return -1;
+    }
+
+    mysql_free_result(res);*/
+    int res=BdBooks_getIdEmployee(reponse, login);
+    if(res==0)
+    {
+        reponse="ADD_EMPLOYEE#KO#L'employe existe deja";
+        return -1;
+    }
+
+    // Insert
+    string requete = "INSERT INTO employees (login, password) VALUES ('" + login + "','" + password + "')";
+
+    if (mysql_query(connexion, requete.c_str()))
+    {
+        reponse = "ADD_EMPLOYEE#KO#Requete INSERT impossible";
+        mysql_close(connexion);
+        return -3;
+    }
+
+    printf("(AddEmployee)Requete INSERT reussie\n");
+    mysql_close(connexion);
+    reponse = "ADD_EMPLOYEE#OK#L'employe a ete ajoute avec succes";
+    return 0;
+}
+
+int BdBooks_Add_EncodedBook(string& reponse,string employee_id,string book_id,string date)
+{
+    //verifs
+    if(employee_id.empty() || book_id.empty() || date.empty())
+    {
+        reponse="ADD_ENCODED_BOOK#KO#Un ou plusieurs champs vides (doit etre ADD_ENCODED_BOOK#employee_id#book_id#date)";
+        return -1;
+    }
+    //verif si employee_id et book_id sont bien des entiers
+    for(int i=0; i<employee_id.length(); i++)
+    {
+        if(!isdigit(employee_id[i]))
+        {
+            reponse="ADD_ENCODED_BOOK#KO#employee_id incorrect (doit etre un entier)";
+            return -1;
+        }
+    }
+    for(int i=0; i<book_id.length(); i++)
+    {
+        if(!isdigit(book_id[i]))
+        {
+            reponse="ADD_ENCODED_BOOK#KO#book_id incorrect (doit etre un entier)";
+            return -1;
+        }
+    }
+    //verif que date est bien une date
+    if(date.length()!=10)
+    {
+        reponse="ADD_ENCODED_BOOK#KO#Date incorrecte (doit etre yyyy-mm-dd)";
+        return -1;
+    }
+    else
+    {
+        if(date[4]!='-' || date[7]!='-')
+        {
+            reponse="ADD_ENCODED_BOOK#KO#Date incorrecte (doit etre yyyy-mm-dd)";
+            return -1;
+        }
+    }
+
+    MYSQL *connexion ;
+    connexion=mysql_init(NULL);
+
+
+    if (mysql_real_connect(connexion, "localhost", "Student", "PassStudent1_", "PourStudent", 0, NULL, 0) == NULL)
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Connexion a la BD impossible";
+        mysql_close(connexion);
+        return -2;
+    }
+
+    printf("(AddEncodedBook)Connexion reussie vers la BD\n");
+
+    // Vérification si l'employé existe déjà
+    string requete_verif = "SELECT id FROM employees WHERE id = " + employee_id;
+
+    if (mysql_query(connexion, requete_verif.c_str()))
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Verification de l'existence de l'employe impossible";
+        mysql_close(connexion);
+        return -3;
+    }
+
+    MYSQL_RES *res = mysql_store_result(connexion);
+    if (res == NULL)
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Erreur lors de la récupération du résultat";
+        mysql_close(connexion);
+        return -4;
+    }
+
+    MYSQL_ROW ligne = mysql_fetch_row(res);
+    if (ligne==NULL)
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#L'employe n'existe pas";
+        mysql_free_result(res);
+        mysql_close(connexion);
+        return -1;
+    }
+
+    mysql_free_result(res);
+
+    // Vérification si le livre existe déjà
+    requete_verif = "SELECT id FROM books WHERE id = " + book_id;
+
+    if (mysql_query(connexion, requete_verif.c_str()))
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Verification de l'existence du livre impossible";
+        mysql_close(connexion);
+        return -3;
+    }
+
+    res = mysql_store_result(connexion);
+    if (res == NULL)
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Erreur lors de la récupération du résultat";
+        mysql_close(connexion);
+        return -4;
+    }    
+
+    ligne = mysql_fetch_row(res);
+    if (ligne==NULL)
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Le livre n'existe pas";
+        mysql_free_result(res);
+        mysql_close(connexion);
+        return -1;
+    }
+
+    mysql_free_result(res);
+
+    // Insert
+    string requete = "INSERT INTO encoded_books (book_id, employee_id, date) VALUES (" + book_id + "," + employee_id + ",'" + date + "')";
+
+    if (mysql_query(connexion, requete.c_str()))
+    {
+        reponse = "ADD_ENCODED_BOOK#KO#Requete INSERT impossible";
+        mysql_close(connexion);
+        return -3;
+    }
+
+    printf("(AddEncodedBook)Requete INSERT reussie\n");
+    mysql_close(connexion);
+    reponse = "ADD_ENCODED_BOOK#OK#Le livre encode a ete ajoute avec succes";
+    return 0;
+}
+

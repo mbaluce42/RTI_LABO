@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <sstream>
+#include <iomanip>//pour setprecision
 using namespace std;
 string portServeur="50000";
 string ipServeur="127.0.0.1";
@@ -90,11 +91,11 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     string reponse;
     if(OBEP_Op((char*)requette.c_str(),reponse) == -1)
     {
-        dialogError("Erreur",reponse);
+        this->dialogError("Erreur",reponse);
+        exit(1);
     }
     else
     {
-        dialogMessage("Succès",reponse);
 
         istringstream is(reponse);
         string ligne;
@@ -108,7 +109,7 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
             getline(is2, prenom, ';');
             getline(is2, date, '\n');
 
-            addComboBoxAuthors(nom+" "+prenom);
+            addComboBoxAuthors(prenom+" "+nom);
         }
     }
 
@@ -116,11 +117,11 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     requette ="GET_SUBJECTS#";
     if(OBEP_Op((char*)requette.c_str(),reponse) == -1)
     {
-        dialogError("Erreur",reponse);
+        this->dialogError("Erreur",reponse);
+        exit(1);
     }
     else
     {
-        dialogMessage("Succès",reponse);
 
         istringstream is(reponse);
         string ligne;
@@ -327,6 +328,8 @@ int MainWindowClientBookEncoder::dialogInputInt(const string& title,const string
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked() 
 {
+    printf("Ajout d'un auteur en cours...\n");
+
     string nom = this->dialogInputText("Nouvel auteur","Nom ?");
     string prenom = this->dialogInputText("Nouvel auteur","Prénom ?");
     string dateNaiss = this->dialogInputText("Nouvel auteur","Date de naissance (yyyy-mm-dd) ?");
@@ -355,6 +358,7 @@ void MainWindowClientBookEncoder::on_pushButtonAddAuthor_clicked()
 
 void MainWindowClientBookEncoder::on_pushButtonAddSubject_clicked() 
 {
+    printf("Ajout d'un sujet en cours...\n");
     string nom;
     nom= this->dialogInputText("Nouveau sujet","Nom ?");
     cout << "Nom du sujet : " << nom << endl;
@@ -392,10 +396,17 @@ void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
     string subject = this->getSelectionSubject();//recup le nom
     string title = this->getTitle();
     string isbn = this->getIsbn();
-    int pageCount = this->getPageCount();
-    float price = this->getPrice();
-    int publishYear = this->getPublishYear();
-    int stockQuantity = this->getStockQuantity();
+    string pageCount = to_string(this->getPageCount());
+    string price = to_string(this->getPrice());
+
+    //remplace la virguile par un point et laise que 2 chiffres apres la virgule
+    replace(price.begin(), price.end(), ',', '.');
+    ostringstream oss; 
+    oss<< fixed << setprecision(2) << price; // Formatage à 2 décimales
+    price = oss.str();
+    
+    string publishYear = to_string(this->getPublishYear());
+    string stockQuantity = to_string(this->getStockQuantity());
 
     requette = "GETID_AUTHOR#"+author;
     if(OBEP_Op((char*)requette.c_str(),resultat)==0)
@@ -410,6 +421,7 @@ void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
         dialogError("Erreur",resultat);
         return;
     }
+    
 
     requette = "GETID_SUBJECT#"+subject;
     if(OBEP_Op((char*)requette.c_str(),resultat)==0)
@@ -425,11 +437,11 @@ void MainWindowClientBookEncoder::on_pushButtonAddBook_clicked() {
         return;
     }
 
-    requette = "ADD_BOOK#"+id_author+"#"+id_subject+"#"+title+"#"+isbn+"#"+to_string(pageCount)+"#"+to_string(stockQuantity)+"#"+to_string(price)+"#"+to_string(publishYear);
+    requette = "ADD_BOOK#"+id_author+"#"+id_subject+"#"+title+"#"+isbn+"#"+pageCount+"#"+stockQuantity+"#"+price+"#"+publishYear;
     if(OBEP_Op((char*)requette.c_str(),resultat)==0)
     {
         dialogMessage("Succès",resultat);
-        this->addTupleTableBooks(IdBook,title,author,subject,isbn,pageCount,publishYear,price,stockQuantity);
+        this->addTupleTableBooks(IdBook, title, author, subject, isbn, stoi(pageCount), stoi(publishYear), stof(price), stoi(stockQuantity));
         IdBook++;
     }
     else
@@ -454,15 +466,18 @@ void MainWindowClientBookEncoder::on_actionLogin_triggered() {
     printf("Tentative de login...\n");
     string resultat;
     string requette= "LOGIN#"+login+"#"+password;
+    int res=OBEP_Op((char*)requette.c_str(),resultat);
 
-    if(OBEP_Op((char*)requette.c_str(),resultat)==0)
+    if(res==0)
     {
-        dialogMessage("Login",resultat);
+        this->dialogMessage("Login",resultat);
         this->loginOk();
+        printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
     }
     else
     {
-        dialogError("Erreur de login",resultat);
+        this->dialogError("Erreur de login",resultat);
+        printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
     }
     
 }
@@ -471,15 +486,18 @@ void MainWindowClientBookEncoder::on_actionLogout_triggered() {
     
     string resultat;
     
+    printf("Tentative de logout...\n");
     int res=OBEP_Op((char*)"LOGOUT#",resultat);
     if(res==0)
     {
-        dialogMessage("Logout",resultat);
+        this->dialogMessage("Logout",resultat);
         this->logoutOk();
+        printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
     }
     else
     {
-        dialogError("Erreur de logout",resultat);
+        this->dialogError("Erreur de logout",resultat);
+        printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
     }
 }
 
@@ -491,11 +509,11 @@ void MainWindowClientBookEncoder::on_actionQuitter_triggered()
     int res=OBEP_Op((char*)requette.c_str(),resultat);
     if(res<0)
     {
-        dialogError("Erreur",resultat);
+        this->dialogError("Erreur",resultat);
     }
     else
     {
-        dialogMessage("Succès",resultat);
+        this->dialogMessage("Succès",resultat);
         ::close(sClient);
         QApplication::exit(0);
     }
@@ -682,6 +700,8 @@ int OBEP_Op(char* requete, string& resultat)
         }
 
     }
+
+    printf("Reponse OBEP(return 0): %s\n", resultat.c_str());
 
     return 0;
 }

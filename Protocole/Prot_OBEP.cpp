@@ -260,6 +260,24 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
 
     }
+    else if(TypeRequete == "GETID_BOOK")
+    {
+        string titre;
+        getline(is, titre, '\n');
+        result="";
+        int res = bdBooks_getIdBook(result, titre);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur bdBooks_getIdBook(): %d\n", res);
+            return false;
+        }
+
+    }
     else if(TypeRequete == "ADD_BOOK")
     {
         string author_id, subject_id, titre, isbn, nbrPage, stockDisponible, prix, anneePublication;
@@ -284,11 +302,94 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
             return false;
         }
     }
-    
+    else if(TypeRequete=="GET_EMPLOYEES")
+    {
+        result="";
+        int res = BdBooks_getEmployees(result);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getEmployees(): %d\n", res);
+            return false;
+        }
+    }
+    else if(TypeRequete=="GETID_EMPLOYEE")
+    {
+        string login;
+        getline(is, login, '\n');
+        result="";
+        int res = BdBooks_getIdEmployee(result, login);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getIdEmployee(): %d\n", res);
+            return false;
+        }
+    }
+    else if(TypeRequete == "ADD_EMPLOYEE")
+    {
+        string login, password;
+        getline(is, login, '#');
+        getline(is, password, '\n');
+        result="";
+        int res = BdBooks_Add_Employee(result, login, password);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_Add_Employee(): %d\n", res);
+            return false;
+        }
+    }
+    else if(TypeRequete == "GET_ENCODED_BOOKS")
+    {
+        result="";
+        int res = BdBooks_getEncodedBooks(result);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getEncodedBooks(): %d\n", res);
+            return false;
+        }
+    }
+    else if(TypeRequete == "ADD_ENCODED_BOOK")
+    {
+        string employee_id, book_id, date;
+        getline(is, employee_id, '#');
+        getline(is, book_id, '#');
+        getline(is, date, '\n');
+        result="";
+        int res = BdBooks_Add_EncodedBook(result, employee_id, book_id, date);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_Add_EncodedBook(): %d\n", res);
+            return false;
+        }
+    }
     else
     {
-        strcpy(reponse, "ERREUR#KO#Requete inconnue");
-        return true; //normalement doit etre false
+        strcpy(reponse,"ERREUR#KO#Requete non reconnue");
+        return false; //normalement doit etre false
     }
     
 }
