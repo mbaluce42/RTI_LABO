@@ -1,18 +1,14 @@
-PROGAMS = serveur client serveurEncodage
+PROGAMS = clientTestServeurEncodage serveurEncodage
 MYSQL_DIR = /usr/lib64/mysql
 MYSQL_INCLUDE = /usr/include/mysql
 
 all: $(PROGAMS)
 
-serveur: serveur.cpp ./Librairies/socket.o ./Protocole/Prot_OBEP.o ./Librairies/BdBooks.o
-	g++ -o serveur serveur.cpp ./Librairies/socket.o ./Protocole/Prot_OBEP.o ./Librairies/BdBooks.o -I$(MYSQL_INCLUDE) -L$(MYSQL_DIR) -lmysqlclient -pthread
-
 serveurEncodage: serveurEncodage.cpp ./Librairies/socket.o ./Protocole/Prot_OBEP.o ./Librairies/BdBooks.o
 	g++ -o serveurEncodage serveurEncodage.cpp ./Librairies/socket.o ./Protocole/Prot_OBEP.o ./Librairies/BdBooks.o -I$(MYSQL_INCLUDE) -L$(MYSQL_DIR) -lmysqlclient -pthread
 
-
-client: client.cpp ./Librairies/socket.o
-	g++ -o client client.cpp ./Librairies/socket.o -I$(MYSQL_INCLUDE) -L$(MYSQL_DIR) -lmysqlclient
+clientTestServeurEncodage: clientTestServeurEncodage.cpp ./Librairies/socket.o
+	g++ -o clientTestServeurEncodage clientTestServeurEncodage.cpp ./Librairies/socket.o -I$(MYSQL_INCLUDE) -L$(MYSQL_DIR) -lmysqlclient
 
 ./Librairies/socket.o: ./Librairies/socket.cpp ./Librairies/socket.h
 	g++ ./Librairies/socket.cpp -c -DDEBUG -o ./Librairies/socket.o

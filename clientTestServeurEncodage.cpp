@@ -44,17 +44,35 @@ int main(int argc, char *argv[])
         exit(1);
     }
     printf("Connecte sur le serveur.\n");
-    // Phase de login
-    /*char user[50], password[50];
-    printf("user: ");
-    fgets(user, 50, stdin);
-    user[strlen(user) - 1] = 0;
-    printf("password: ");
-    fgets(password, 50, stdin);
-    password[strlen(password) - 1] = 0;
-    printf("Tentative de login...\n");
-    if (!OBEP_Login(user, password))
-        exit(1);*/
+
+    printf("Bienvenu sur le client Test du Serveur Encodage\n");
+    printf("Toutes les operations sont a taper sur la ligne de commande\n");
+    //print menu
+    printf("Liste des operations disponibles :\n\n");
+    
+    printf("1.  GET_SUBJECTS#\n");
+    printf("2.  GETID_SUBJECT#[nomSujet]\n");
+    printf("3.  GET_AUTHORS#\n");
+    printf("4.  GETID_AUTHOR#[prenomAuteur] [nomAuteur]\n");
+    printf("5.  GET_BOOKS#\n");
+    printf("6.  GETID_BOOK#[titreLivre]\n");
+    printf("7.  GETID_EMPLOYEE#[loginEmploye]\n");
+    printf("8.  GET_ENCODED_BOOKS#\n");
+    printf("9.  GET_EMPLOYEES#\n\n");
+    printf("10. ADD_AUTHOR#[nomAuteur]#[prenomAuteur]#[dateNaissance]\n");
+    printf("11. ADD_SUBJECT#[nomSujet]\n");
+    printf("12. ADD_BOOK#[idAuteur]#[idSujet]#[titre]#[isbn]#[nombrePages]#[stockDisponible]#[prix]#[anneePublication]\n");
+    printf("13. ADD_EMPLOYEE#[login]#[motDePasse]\n");
+    printf("14. ADD_ENCODED_BOOK#[idEmploye]#[idLivre]#[date]\n\n");
+
+    //remplacer [] par les valeurs
+    //exemple: ADD_AUTHOR#Doe#John#01/01/2000
+    printf("remplacer [] par les valeurs\n");
+    printf("format de la date: aaa-mm-jj\n");
+    printf("format de l'isbn: 978-2123456803(3 chiffres avant le tiret et 10 chiffres apres)\n\n");
+    
+
+
     while (1)
     {
         printf("Operation (<CTRL-C> four fin) : ");
