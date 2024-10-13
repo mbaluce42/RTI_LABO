@@ -32,7 +32,7 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
     , ui(new Ui::MainWindowClientBookEncoder)
 {
     ui->setupUi(this);
-    ::close(2);
+    //::close(2);
 
     //this->setFixedSize(1068, 301);
 
@@ -591,6 +591,7 @@ int OBEP_Op(char* requete, string& resultat)
         // *****Parsing de la réponse **************************
         istringstream is(reponse);
         string TypeRequete;
+
         getline(is, TypeRequete, '_'); // skip le type (add, get)
         if(TypeRequete == "ADD")
         {
@@ -729,7 +730,7 @@ int Echange(char *requete, char *reponse)
         close(sClient);
         return -3;
     }
-    reponse[nbLus] = 0;
+    reponse[nbLus] = 0; 
 
     return 0;
 }

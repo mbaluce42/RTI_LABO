@@ -52,15 +52,9 @@ int retirerClient(int socketClient)
 }
 
 
-/*bool OBEP_Parser(char* requete, char* reponse, int socketClient)
-{*/
-    // separe les champs de la ligne ';'
-    /*stringstream ss(ligne);
-    string typeImage, nomFichierImage, nomImage;
-    getline(ss, typeImage, ';');
-    getline(ss, nomFichierImage, ';');
-    getline(ss, nomImage, ';');*/
-    /*istringstream is(requete);
+bool OBEP_Parser(char* requete, char* reponse, int socketClient)
+{
+    istringstream is(requete);
     string TypeRequete;
     getline(is, TypeRequete, '#');
     string result;
@@ -352,7 +346,7 @@ int retirerClient(int socketClient)
             return false;
         }
     }
-    else if(TypeRequete == "GET_ENCODED_BOOKS")
+    else if(TypeRequete == "GET_ENCODEDBOOKS")
     {
         result="";
         int res = BdBooks_getEncodedBooks(result);
@@ -367,7 +361,7 @@ int retirerClient(int socketClient)
             return false;
         }
     }
-    else if(TypeRequete == "ADD_ENCODED_BOOK")
+    else if(TypeRequete == "ADD_ENCODEDBOOK")
     {
         string employee_id, book_id, date;
         getline(is, employee_id, '#');
@@ -386,13 +380,14 @@ int retirerClient(int socketClient)
             return false;
         }
     }
+    
     else
     {
         strcpy(reponse,"ERREUR#KO#Requete non reconnue");
         return false; //normalement doit etre false
     }
     
-}*/
+}
 bool OBEP_Login(const char* user, const char* password)
 {
     if(strcmp(user, "admin")==0 && strcmp(password, "admin")==0) return true;
@@ -431,11 +426,6 @@ void OBEP_Close()
 bool OBEP_Parser(string requete, string& reponse, int socketClient)
 {
     // separe les champs de la ligne ';'
-    /*stringstream ss(ligne);
-    string typeImage, nomFichierImage, nomImage;
-    getline(ss, typeImage, ';');
-    getline(ss, nomFichierImage, ';');
-    getline(ss, nomImage, ';');*/
     istringstream is(requete);
     string TypeRequete;
     getline(is, TypeRequete, '#');

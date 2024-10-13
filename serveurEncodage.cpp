@@ -129,7 +129,7 @@ void HandlerSIGINT(int s) {
     exit(0);
 }
 
-void TraitementConnexion(int sService) {
+/*void TraitementConnexion(int sService) {
     //char reponse[4048], requete[4048];
     string reponse , requete;
     int nbLus, nbEcrits;
@@ -164,4 +164,43 @@ void TraitementConnexion(int sService) {
         //    printf("\t[THREAD %p] Fin de connexion de la socket %d\n", pthread_self(), sService);
     }
     close(sService);
+}*/
+
+//en char
+void TraitementConnexion(int sService)
+{
+    char reponse[4048], requete[4048];
+    int nbLus, nbEcrits;
+    bool onContinue = true;
+    while (onContinue)
+    {
+        printf("\t[THREAD %p] Attente requete...\n", pthread_self());
+        // ***** Reception Requete ******************
+        if ((nbLus = ReceiveSocket(sService, requete)) <= 0)
+        {
+            // ***** Fin de connexion ? *****************
+            if (nbLus < 0) perror("Erreur de Receive");
+            printf("\t[THREAD %p] Fin de connexion du client averc la socket %d\n", pthread_self(), sService);
+            close(sService);
+            return;
+        }
+        //verif si le caractere de fin de chaine est present et si non on le rajoute
+        if(requete[nbLus-1] != '\0')
+        {
+            requete[nbLus] = '\0';
+        }
+        
+        //requete[nbLus] = 0;
+        printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
+        // ***** Traitement de la requete ***********
+        onContinue = OBEP_Parser(requete, reponse, sService);
+        // ***** Envoi de la
+        if ((nbEcrits = SendSocket(sService, reponse, strlen(reponse))) == -1)
+        {
+            perror("Erreur de Send");
+            close(sService);
+            return;
+        }
+    }
+
 }

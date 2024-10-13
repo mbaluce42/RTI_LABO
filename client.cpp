@@ -17,7 +17,7 @@ int Echange(string requete, string& reponse);
 bool OBEP_Login(const char *user, const char *password);
 void OBEP_Logout();
 void SMOP_Operation(char op, int a, int b);
-//int OBEP_Op(char* requete, string& resultat);
+int OBEP_Op(char* requete, string& resultat);
 int OBEP_Op(string requete, string& resultat);
 int main(int argc, char *argv[])
 {
@@ -57,11 +57,8 @@ int main(int argc, char *argv[])
         exit(1);*/
     while (1)
     {
-        int a, b;
-        char op;
         printf("Operation (<CTRL-C> four fin) : ");
-        //recup le string
-        string operation;
+        /*string operation;
         getline(cin, operation, '\n');
 
         int res = OBEP_Op(operation, operation);
@@ -72,9 +69,24 @@ int main(int argc, char *argv[])
         else
         {
             printf("Erreur: %s\n", operation.c_str());
-        }
+        }*/
 
-        //SMOP_Operation(op, a, b);
+        char requete[4048];
+        string reponse;
+        printf("Operation (<CTRL-C> four fin) : ");
+        fflush(stdin);
+        //scanf("%d %c %d",&a,&op,&b); // pas ouf !
+        fgets(requete, 4048, stdin);
+        //obep char
+        int res=OBEP_Op(requete,reponse);
+        if(res==0)
+        {
+            printf("Reponse: %s\n", reponse.c_str());
+        }
+        else
+        {
+            printf("Erreur: %s\n", reponse.c_str());
+        }
     }
 }
 /*
@@ -269,13 +281,13 @@ void OBEP_Logout()
 }
 
 //*******************************************************************
+//en string
 int OBEP_Op(string requete, string& resultat)
 {
     //char reponse[4048];
     string reponse;
     int res;
     // *****Envoi requete + réception réponse **************
-    //res=Echange(requete, reponse);
     res=Echange(requete, reponse);
     if(res<0)
     {
@@ -409,6 +421,97 @@ int OBEP_Op(string requete, string& resultat)
 
     return 0;
 }
+//en char
+int OBEP_Op(char* requete, string& resultat)
+{
+    char reponse[4048];
+    int res;
+    // *****Envoi requete + réception réponse **************
+    res=Echange(requete, reponse);
+    if(res<0)
+    {
+        return -1;
+    }
+    else
+    {
+        // *****Parsing de la réponse **************************
+        istringstream is(reponse);
+        string TypeRequete;
+        getline(is, TypeRequete, '_'); // skip le type (add, get)
+        if(TypeRequete == "ADD")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+
+            string status;
+            string message;
+            getline(is, status, '#');//recupere le status de la requete
+            getline(is, message, '\n'); //recupere le message de la requete
+            resultat = message;
+            if(status == "OK")
+            {
+                
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else if(TypeRequete == "GET")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages + '\n';
+                while (getline(is, messages, '\n'))
+                {
+                    resultat += messages;
+                    resultat += '\n';
+                }
+                
+            }
+            else
+            {
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+        else if(TypeRequete=="GETID")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages;
+            }
+            else
+            {
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+
+    }
+
+    printf("Reponse OBEP(return 0): %s\n", resultat.c_str());
+
+    return 0;
+}
+
 //***** Echange de données entre client et serveur ******************
 int Echange(char *requete, char *reponse)
 {
