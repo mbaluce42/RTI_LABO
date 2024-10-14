@@ -4,7 +4,7 @@ file(REMOVE_RECURSE
   "ClientBookEncoder_autogen"
   "CMakeFiles/ClientBookEncoder.dir/ClientBookEncoder_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/ClientBookEncoder.dir/__/Librairies/moc_socket.cpp.o"
-  "CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o"
+  "CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.o"
   "CMakeFiles/ClientBookEncoder.dir/main.cpp.o"
   "CMakeFiles/ClientBookEncoder.dir/mainwindowclientbookencoder.cpp.o"
   "CMakeFiles/ClientBookEncoder.dir/moc_mainwindowclientbookencoder.cpp.o"

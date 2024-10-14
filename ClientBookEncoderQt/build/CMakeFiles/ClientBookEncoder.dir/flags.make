@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB
 
-CXX_INCLUDES = -I/home/student/Bureau/RTI_LABO/ClientBookEncoderQt/build/ClientBookEncoder_autogen/include -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtGui
+CXX_INCLUDES = -I"/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt/build/ClientBookEncoder_autogen/include" -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtWidgets -isystem /usr/include/qt5/QtGui
 
 CXX_FLAGS = -fPIC
 

@@ -67,10 +67,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/student/Bureau/RTI_LABO/ClientBookEncoderQt
+CMAKE_SOURCE_DIR = "/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/student/Bureau/RTI_LABO/ClientBookEncoderQt/build
+CMAKE_BINARY_DIR = "/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt/build"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Bureau/RTI_LABO/ClientBookEncoderQt/build/CMakeFiles /home/student/Bureau/RTI_LABO/ClientBookEncoderQt/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start "/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt/build/CMakeFiles" "/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt/build//CMakeFiles/progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Bureau/RTI_LABO/ClientBookEncoderQt/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "/home/student/Bureau/RTI_LABOAncienne version/RTI_LABO/ClientBookEncoderQt/build/CMakeFiles" 0
 .PHONY : all
 
 # The main clean target
@@ -209,32 +209,32 @@ __/Librairies/moc_socket.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/__/Librairies/moc_socket.cpp.s
 .PHONY : __/Librairies/moc_socket.cpp.s
 
-home/student/Bureau/RTI_LABO/Librairies/socket.o: home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.o: home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.o
 
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.o
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.o
 
 # target to build an object file
-home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.cpp.o
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.o
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.o
 
-home/student/Bureau/RTI_LABO/Librairies/socket.i: home/student/Bureau/RTI_LABO/Librairies/socket.cpp.i
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.i: home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.i
 
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.i
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.i
 
 # target to preprocess a source file
-home/student/Bureau/RTI_LABO/Librairies/socket.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.i
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.cpp.i
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.i
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.i
 
-home/student/Bureau/RTI_LABO/Librairies/socket.s: home/student/Bureau/RTI_LABO/Librairies/socket.cpp.s
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.s: home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.s
 
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.s
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.s
 
 # target to generate assembly for a file
-home/student/Bureau/RTI_LABO/Librairies/socket.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABO/Librairies/socket.cpp.s
-.PHONY : home/student/Bureau/RTI_LABO/Librairies/socket.cpp.s
+home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ClientBookEncoder.dir/build.make CMakeFiles/ClientBookEncoder.dir/home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.s
+.PHONY : home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.cpp.s
 
 main.o: main.cpp.o
 
@@ -360,9 +360,9 @@ help:
 	@echo "... __/Librairies/moc_socket.o"
 	@echo "... __/Librairies/moc_socket.i"
 	@echo "... __/Librairies/moc_socket.s"
-	@echo "... home/student/Bureau/RTI_LABO/Librairies/socket.o"
-	@echo "... home/student/Bureau/RTI_LABO/Librairies/socket.i"
-	@echo "... home/student/Bureau/RTI_LABO/Librairies/socket.s"
+	@echo "... home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.o"
+	@echo "... home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.i"
+	@echo "... home/student/Bureau/RTI_LABOAncienne_version/RTI_LABO/Librairies/socket.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
