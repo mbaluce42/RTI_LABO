@@ -249,6 +249,10 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         {
             return true;
         }
+        else if(res==-99)
+        {
+            return true;
+        }
         else
         {
             printf("Erreur BdBooks_Add_Subject(): %d\n", res);

@@ -169,11 +169,11 @@ void HandlerSIGINT(int s) {
 //en char
 void TraitementConnexion(int sService)
 {
-    char reponse[4048], requete[4048];
     int nbLus, nbEcrits;
     bool onContinue = true;
     while (onContinue)
     {
+        char reponse[4048], requete[4048];
         printf("\t[THREAD %p] Attente requete...\n", pthread_self());
         // ***** Reception Requete ******************
         if ((nbLus = ReceiveSocket(sService, requete)) <= 0)
@@ -194,10 +194,16 @@ void TraitementConnexion(int sService)
         printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
         // ***** Traitement de la requete ***********
         onContinue = OBEP_Parser(requete, reponse, sService);
-        // ***** Envoi de la
+        // ***** Envoi de la reponse ****************
+        if(reponse[strlen(reponse)-1] != '\0')
+        {
+            reponse[strlen(reponse)] = '\0';
+        }
+        printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse);
         if ((nbEcrits = SendSocket(sService, reponse, strlen(reponse))) == -1)
         {
             perror("Erreur de Send");
+            printf("\t[THREAD %p] Fin de connexion du client averc la socket %d car erreur de send\n", pthread_self(), sService);
             close(sService);
             return;
         }
