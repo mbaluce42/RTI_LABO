@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sstream> // Add this line to include <sstream>
 
-
+using namespace std;
 int BdBooks_getSubjets(string& result)
 {
     MYSQL *connexion;
@@ -68,7 +68,7 @@ int BdBooks_getSubjets(string& result)
     
 }
 
-int BdBooks_getIdSubject(string& result,string nom)
+int BdBooks_getIdSubjectByNom(string& result,string nom)
 {
     if(nom.empty())
     {
@@ -185,7 +185,7 @@ int BdBooks_getAuthors(string &result)
     return 0;
 }
 
-int BdBooks_getIdAuthor(string& result,string prenom, string nom)
+int BdBooks_getIdAuthorByPrenomNom(string& result,string prenom, string nom)
 {
 
     if(prenom.empty() || nom.empty())
@@ -306,7 +306,72 @@ int bdBooks_getBooks(string& result)
     return 0;
 }
 
-int bdBooks_getIdBook(string& result,string titre)
+int bdBooks_getBookById(string& result,string book_id)
+{
+    if(book_id.empty())
+    {
+        result="GET_BOOKBYID#KO#Id du livre vide (doit etre GET_BOOK#idLivre)";
+        return -1;
+    }
+
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GET_BOOKBYID#KO#Connexion a la BD impossible";
+        return -1; //"ERROR BD";
+    }
+    printf("(GetBook)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT * FROM books WHERE id = "+book_id;
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GET_BOOKBYID#KO#Requete SELECT impossible";
+        return -2;//"ERROR REQUETE";
+    }
+
+    printf("(GetBook)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GET_BOOKBYID#KO#Recuperation des resultats impossible";
+        return -3;//"ERROR RECUP RESULTAT";
+    }
+    printf("(GetBook)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    int nbrChamps = mysql_num_fields(resultat); //nombre de colonnes
+    ostringstream ossResultat;
+    ossResultat<< "GET_BOOKBYID#OK" <<'\n';
+
+    while((ligne=mysql_fetch_row(resultat))!=NULL)
+    {
+        for(int i=0; i<nbrChamps; i++)
+        {
+            ossResultat << ligne[i];
+            if(i<nbrChamps-1)
+            {
+                ossResultat<< ";";
+            }    
+        }
+        ossResultat << '\n';
+    }
+    printf("\n(GetBook)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+
+    return 0;
+}
+
+int bdBooks_getIdBookByLivre(string& result,string titre)
 {
     if(titre.empty())
     {
@@ -364,7 +429,7 @@ int bdBooks_getIdBook(string& result,string titre)
     return 0;
 }
 
-int BdBooks_getIdEmployee(string& result,string login)
+int BdBooks_getIdEmployeeByLogin(string& result,string login)
 {
     if(login.empty())
     {
@@ -544,6 +609,7 @@ int BdBooks_getEmployees(string& result)
 }
 
 
+
 int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
 {
     if(nom.empty() || prenom.empty() || date.empty())
@@ -584,38 +650,9 @@ int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
 
     printf("(AddAuthor)Connexion reussie vers la BD\n");
 
-    
     // Vérification si l'auteur existe déjà
-    /*string requete_verif = "SELECT id FROM authors WHERE last_name = '" + nom + 
-                           "' AND first_name = '" + prenom + "' AND birth_date = '" + date + "'";
-    
-    if (mysql_query(connexion, requete_verif.c_str()))
-    {
-        result = "ADD_AUTHOR#KO#Verification de l'existence de l'auteur impossible";
-        mysql_close(connexion);
-        return -3;
-    }
 
-    MYSQL_RES *res = mysql_store_result(connexion);
-    if (res == NULL)
-    {
-        result = "ADD_AUTHOR#KO#Erreur lors de la récupération du résultat";
-        mysql_close(connexion);
-        return -4;
-    }
-
-    MYSQL_ROW ligne = mysql_fetch_row(res);
-    if (ligne!=NULL)
-    {
-        result = "ADD_AUTHOR#KO#L'auteur existe deja";
-        mysql_free_result(res);
-        mysql_close(connexion);
-        return -1;
-    }
-
-    mysql_free_result(res);*/
-
-    int res=BdBooks_getIdAuthor(result, prenom, nom);
+    int res=BdBooks_getIdAuthorByPrenomNom(result, prenom, nom);
     if(res==0)
     {
         result="ADD_AUTHOR#KO#L'auteur existe deja";
@@ -623,7 +660,6 @@ int BdBooks_Add_Author(string& result, string nom, string prenom, string date)
     }
 
     
-
     // Insertion de l'auteur
     string requete = "INSERT INTO authors (last_name, first_name, birth_date) VALUES ('" +
                      nom + "','" + prenom + "','" + date + "')";
@@ -708,7 +744,7 @@ int BdBooks_Add_Subject(string& result,string nom)
 
     mysql_free_result(res);*/
 
-    int res=BdBooks_getIdSubject(result, nom);
+    int res=BdBooks_getIdSubjectByNom(result, nom);
     if(res==0)
     {
         result="ADD_SUBJECT#KO#Le sujet existe deja";
@@ -980,11 +1016,11 @@ int BdBooks_Add_Employee(string& reponse,string login,string password)
     }
 
     mysql_free_result(res);*/
-    int res=BdBooks_getIdEmployee(reponse, login);
+    int res=BdBooks_getIdEmployeeByLogin(reponse, login);
     if(res==0)
     {
         reponse="ADD_EMPLOYEE#KO#L'employe existe deja";
-        return -1;
+        return -99;
     }
 
     // Insert
@@ -1130,3 +1166,89 @@ int BdBooks_Add_EncodedBook(string& reponse,string employee_id,string book_id,st
     return 0;
 }
 
+
+
+int BdBooks_getEncodedBooksByEmployee(string& result,string employee_id) //get all books encoded by an employee
+{
+    if(employee_id.empty())
+    {
+        result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#employee_id vide (doit etre GET_ENCODEDBOOKSBYEMPLOYEE#employee_id)";
+        return -1;
+    }
+    //verif si employee_id est bien un entier
+    for(int i=0; i<employee_id.length(); i++)
+    {
+        if(!isdigit(employee_id[i]))
+        {
+            result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#employee_id incorrect (doit etre un entier)";
+            return -1;
+        }
+    }
+
+    MYSQL *connexion;
+    connexion = mysql_init(NULL);
+
+    mysql_set_character_set(connexion, "utf8");
+
+    //connection a la base de donnees
+    if(mysql_real_connect(connexion, "localhost","Student","PassStudent1_","PourStudent",0,NULL,0)==NULL)
+    {
+        result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#Connexion a la BD impossible";
+        return -1; ;
+    }
+    printf("(GetEncodedBooksByEmployee)Connexion reussie vers la BD\n");
+
+    string requete = "SELECT * FROM encoded_books WHERE employee_id = " + employee_id;  //recuperation des livres encodes par l'employe
+
+    if(mysql_query(connexion, requete.c_str()))
+    {
+        result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#Requete SELECT impossible";
+        return -2;
+    }
+
+    printf("(GetEncodedBooksByEmployee)Requete SELECT reussie\n");
+
+    //recuperation des resultats
+    MYSQL_RES *resultat;
+    if((resultat=mysql_store_result(connexion))==NULL)
+    {
+        result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#Recuperation des resultats impossible";
+        return -3;
+    }
+    printf("(GetEncodedBooksByEmployee)Recuperation des resultats reussie\n");
+
+    MYSQL_ROW ligne;
+    int nbrChamps = mysql_num_fields(resultat); //nombre de colonnes
+    ostringstream ossResultat;
+    ossResultat<< "GET_ENCODEDBOOKSBYEMPLOYEE#OK" <<'\n';
+
+    //verif si l'employe a encode des livres
+    ligne=mysql_fetch_row(resultat);
+    if(ligne==NULL)
+    {
+        result="GET_ENCODEDBOOKSBYEMPLOYEE#KO#L'employe n'a encode aucun livre";
+        return -4;
+    }
+
+    mysql_data_seek(resultat, 0); //retour au debut du resultat
+
+    while((ligne=mysql_fetch_row(resultat))!=NULL)
+    {
+        for(int i=0; i<nbrChamps; i++)
+        {
+            ossResultat << ligne[i];
+            if(i<nbrChamps-1)
+            {
+                ossResultat<< ";";
+            }    
+        }
+        ossResultat << '\n';
+    }
+    printf("\n(GetEncodedBooksByEmployee)Traitement des resultats reussi\n");
+    mysql_free_result(resultat);
+    mysql_close(connexion);
+
+    result = ossResultat.str();
+
+    return 0;
+}

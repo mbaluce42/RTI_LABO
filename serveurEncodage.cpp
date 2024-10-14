@@ -190,7 +190,7 @@ void TraitementConnexion(int sService)
             requete[nbLus] = '\0';
         }
         
-        //requete[nbLus] = 0;
+        requete[nbLus] = 0;
         printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
         // ***** Traitement de la requete ***********
         onContinue = OBEP_Parser(requete, reponse, sService);

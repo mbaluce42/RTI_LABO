@@ -58,19 +58,21 @@ int main(int argc, char *argv[])
     printf("6.  GETID_BOOK#[titreLivre]\n");
     printf("7.  GETID_EMPLOYEE#[loginEmploye]\n");
     printf("8.  GET_ENCODED_BOOKS#\n");
-    printf("9.  GET_EMPLOYEES#\n\n");
-    printf("10. ADD_AUTHOR#[nomAuteur]#[prenomAuteur]#[dateNaissance]\n");
-    printf("11. ADD_SUBJECT#[nomSujet]\n");
-    printf("12. ADD_BOOK#[idAuteur]#[idSujet]#[titre]#[isbn]#[nombrePages]#[stockDisponible]#[prix]#[anneePublication]\n");
-    printf("13. ADD_EMPLOYEE#[login]#[motDePasse]\n");
-    printf("14. ADD_ENCODED_BOOK#[idEmploye]#[idLivre]#[date]\n\n");
+    printf("9. GET_ENCODEDBOOKSBYEMPLOYEE#[idEmploye]\n");
+
+    printf("10.  GET_EMPLOYEES#\n\n");
+    printf("11. ADD_AUTHOR#[nomAuteur]#[prenomAuteur]#[dateNaissance]\n");
+    printf("12. ADD_SUBJECT#[nomSujet]\n");
+    printf("13. ADD_BOOK#[idAuteur]#[idSujet]#[titre]#[isbn]#[nombrePages]#[stockDisponible]#[prix]#[anneePublication]\n");
+    printf("14. ADD_EMPLOYEE#[login]#[motDePasse]\n");
+    printf("15. ADD_ENCODED_BOOK#[idEmploye]#[idLivre]#[date]\n\n");
+
 
     //remplacer [] par les valeurs
     //exemple: ADD_AUTHOR#Doe#John#01/01/2000
     printf("remplacer [] par les valeurs\n");
     printf("format de la date: aaa-mm-jj\n");
-    printf("format de l'isbn: 978-2123456803(3 chiffres avant le tiret et 10 chiffres apres)\n\n");
-    
+    printf("format de l'isbn: 978-2123456803(3 chiffres avant le tiret et 10 chiffres apres)\n\n");    
 
 
     while (1)

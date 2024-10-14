@@ -159,39 +159,47 @@ int main(int argc,char *argv[])
   mysql_real_connect(connexion,"localhost","Student","PassStudent1_","PourStudent",0,0,0);
 
   // Supprimer la table books si elle existe déjà
-  printf("Suppression de la table books si elle existe déjà...\n");
 
+  printf("Suppression de la table caddies_items si elle existe\n");
+  if (mysql_query(connexion,"DROP TABLE IF EXISTS caddies_items;")) {
+    finish_with_error(connexion);
+  }
+
+  printf("Suppression de la table encoded_books si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS encoded_books;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table books si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS books;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table caddies si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS caddies;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table clients si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS clients;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table employees si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS employees;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table authors si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS authors;")) {
     finish_with_error(connexion);
   }
 
+  printf("Suppression de la table subjects si elle existe\n");
   if (mysql_query(connexion,"DROP TABLE IF EXISTS subjects;")) {
     finish_with_error(connexion);
   }
 
-  if (mysql_query(connexion,"DROP TABLE IF EXISTS caddies_items;")) {
-    finish_with_error(connexion);
-  }
 
   // Creation de la table authors
   printf("Creation de la table authors...\n");

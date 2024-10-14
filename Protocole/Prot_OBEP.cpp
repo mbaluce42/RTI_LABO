@@ -72,7 +72,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
         else
         {
-            if(OBEP_Login(user.c_str(), password.c_str()))
+            /*if(OBEP_Login(user.c_str(), password.c_str()))
             {
                 ajouterClient(socketClient);
                 strcpy(reponse, "LOGIN#OK#Le client loggé avec succes");
@@ -83,10 +83,29 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
             {
                 strcpy(reponse, "LOGIN#KO#Login ou mot de passe incorrect");
                 return false;
+            }*/
+            string result;
+
+            int res = BdBooks_Add_Employee(result, user, password);
+            if(res==0)
+            {
+                strcpy(reponse, result.c_str());
+                ajouterClient(socketClient);
+                return true;
+            }
+            else if(res==-99) //employe existe deja
+            {
+                strcpy(reponse,"LOGIN#OK#Employe existe deja, connexion reussie");
+                ajouterClient(socketClient);
+                return true;
+            }
+            else
+            {
+                strcpy(reponse, result.c_str());
+                printf("Erreur BdBooks_Add_Employee(): %d\n", res);
+                return false;
             }
         }
-        
-        
     
     }
     else if(TypeRequete == "LOGOUT")
@@ -103,7 +122,6 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
             strcpy(reponse, "LOGOUT#KO#Client pas trouve, deconnexion impossible");
             return false;
         }
-        
     }
     else if(TypeRequete == "OPER")
     {
@@ -151,7 +169,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         getline(is, prenom, ' ');
         getline(is, nom, '\n');
         result="";
-        int res = BdBooks_getIdAuthor(result, prenom, nom);
+        int res = BdBooks_getIdAuthorByPrenomNom(result, prenom, nom);
         strcpy(reponse, result.c_str());
         if(res==0)
         {
@@ -159,7 +177,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
         else
         {
-            printf("Erreur BdBooks_getIdAuthor(): %d\n", res);
+            printf("Erreur BdBooks_getIdAuthorByPrenomNom(): %d\n", res);
             return false;
         }
     }
@@ -207,7 +225,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         string nom;
         getline(is, nom, '\n');
         result="";
-        int res = BdBooks_getIdSubject(result, nom);
+        int res = BdBooks_getIdSubjectByNom(result, nom);
         strcpy(reponse, result.c_str());
         if(res==0)
         {
@@ -215,7 +233,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
         else
         {
-            printf("Erreur BdBooks_getIdSubject(): %d\n", res);
+            printf("Erreur BdBooks_getIdSubjectByNom(): %d\n", res);
             return false;
         }
 
@@ -254,12 +272,30 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
 
     }
+
+    else if(TypeRequete=="GET_BOOKBYID")
+    {
+        string id;
+        getline(is, id, '\n');
+        result="";
+        int res = bdBooks_getBookById(result, id);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur bdBooks_getBookById(): %d\n", res);
+            return false;
+        }
+    }
     else if(TypeRequete == "GETID_BOOK")
     {
         string titre;
         getline(is, titre, '\n');
         result="";
-        int res = bdBooks_getIdBook(result, titre);
+        int res = bdBooks_getIdBookByLivre(result, titre);
         strcpy(reponse, result.c_str());
         if(res==0)
         {
@@ -316,7 +352,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         string login;
         getline(is, login, '\n');
         result="";
-        int res = BdBooks_getIdEmployee(result, login);
+        int res = BdBooks_getIdEmployeeByLogin(result, login);
         strcpy(reponse, result.c_str());
         if(res==0)
         {
@@ -324,7 +360,7 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         }
         else
         {
-            printf("Erreur BdBooks_getIdEmployee(): %d\n", res);
+            printf("Erreur BdBooks_getIdEmployeeByLogin(): %d\n", res);
             return false;
         }
     }
@@ -358,6 +394,25 @@ bool OBEP_Parser(char* requete, char* reponse, int socketClient)
         else
         {
             printf("Erreur BdBooks_getEncodedBooks(): %d\n", res);
+            return false;
+        }
+    }
+    //getEncodedBooksByEmployee
+    else if(TypeRequete == "GET_ENCODEDBOOKSBYEMPLOYEE")
+    {
+        string employee_id;
+        getline(is, employee_id, '\n');
+        result="";
+        int res = BdBooks_getEncodedBooksByEmployee(result, employee_id);
+        strcpy(reponse, result.c_str());
+        if(res==0)
+        {
+            return true;
+        }
+        else
+        {
+            printf("Erreur BdBooks_getEncodedBooksByEmployee(): %d\n", res);
+            printf("Reponse: %s\n", result.c_str());
             return false;
         }
     }
@@ -524,7 +579,7 @@ bool OBEP_Parser(string requete, string& reponse, int socketClient)
         getline(is, prenom, ' ');
         getline(is, nom, '\n');
         result="";
-        int res = BdBooks_getIdAuthor(reponse, prenom, nom);
+        int res = BdBooks_getIdAuthorByPrenomNom(reponse, prenom, nom);
         if(res==0)
         {
             return true;
@@ -577,14 +632,14 @@ bool OBEP_Parser(string requete, string& reponse, int socketClient)
         string nom;
         getline(is, nom, '\n');
         result="";
-        int res = BdBooks_getIdSubject(reponse, nom);
+        int res = BdBooks_getIdSubjectByNom(reponse, nom);
         if(res==0)
         {
             return true;
         }
         else
         {
-            printf("Erreur BdBooks_getIdSubject(): %d\n", res);
+            printf("Erreur BdBooks_getIdSubjectByNom(): %d\n", res);
             return false;
         }
 
@@ -626,7 +681,7 @@ bool OBEP_Parser(string requete, string& reponse, int socketClient)
         string titre;
         getline(is, titre, '\n');
         result="";
-        int res = bdBooks_getIdBook(reponse, titre);
+        int res = bdBooks_getIdBookByLivre(reponse, titre);
         if(res==0)
         {
             return true;
@@ -677,17 +732,18 @@ bool OBEP_Parser(string requete, string& reponse, int socketClient)
     }
     else if(TypeRequete=="GETID_EMPLOYEE")
     {
-        string login;
+        string login, password;
         getline(is, login, '\n');
+        getline(is, password, '\n');
         result="";
-        int res = BdBooks_getIdEmployee(reponse, login);
+        int res = BdBooks_getIdEmployeeByLogin(reponse, login);
         if(res==0)
         {
             return true;
         }
         else
         {
-            printf("Erreur BdBooks_getIdEmployee(): %d\n", res);
+            printf("Erreur BdBooks_getIdEmployeeByLogin(): %d\n", res);
             return false;
         }
     }

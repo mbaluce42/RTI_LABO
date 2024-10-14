@@ -2,7 +2,7 @@
 #define SOCKET_H
 
 #include <string>
-#define TAILLE_BUFFER 4096
+#define TAILLE_BUFFER 4048
 
 using namespace std;
 

@@ -14,7 +14,7 @@ string ipServeur="127.0.0.1";
 
 int sClient=0;
 int IdBook=1;
-
+string IdEmployeeConnected;
 void HandlerSIGINT(int s) ;
 
 //***** Gestion du protocole SMOP ***********************************
@@ -138,6 +138,35 @@ MainWindowClientBookEncoder::MainWindowClientBookEncoder(QWidget *parent)
         }
     }
     
+    /*requette ="GET_BOOKS#";
+    if(OBEP_Op((char*)requette.c_str(),reponse) == -1)
+    {
+        this->dialogError("Erreur",reponse);
+        exit(1);
+    }
+    else
+    {
+        istringstream is(reponse);
+        string ligne;
+        printf("Reponse: %s\n", reponse.c_str());
+        
+        while (getline(is, ligne, '\n'))
+        {
+            istringstream is2(ligne);
+            string id, titre, auteur, sujet, isbn, pages, annee, prix, stock;
+            getline(is2, id, ';');
+            getline(is2, titre, ';');
+            getline(is2, auteur, ';');
+            getline(is2, sujet, ';');
+            getline(is2, isbn, ';');
+            getline(is2, pages, ';');
+            getline(is2, annee, ';');
+            getline(is2, prix, ';');
+            getline(is2, stock, '\n');
+
+            addTupleTableBooks(stoi(id),titre,auteur,sujet,isbn,stoi(pages),stoi(annee),stof(prix),stoi(stock));
+        }
+    }*/
 }
 
 MainWindowClientBookEncoder::~MainWindowClientBookEncoder() {
@@ -467,12 +496,78 @@ void MainWindowClientBookEncoder::on_actionLogin_triggered() {
     string resultat;
     string requette= "LOGIN#"+login+"#"+password;
     int res=OBEP_Op((char*)requette.c_str(),resultat);
-
     if(res==0)
     {
         this->dialogMessage("Login",resultat);
         this->loginOk();
         printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
+
+        //rechere tous les livres encodés par l'utilisateur
+        /*requette = "GETID_EMPLOYEE#"+login;
+        string employeeId;
+        if(OBEP_Op((char*)requette.c_str(),employeeId)==0)
+        {
+            istringstream is(employeeId);
+            string id;
+            getline(is, id, '\n');
+            IdEmployeeConnected = id;
+            requette="GET_ENCODEDBOOKSBYEMPLOYEE#"+id;
+            string encodedBooksId;
+            if(OBEP_Op((char*)requette.c_str(),encodedBooksId)==0)
+            {
+                istringstream is(encodedBooksId);
+                string ligne;
+                while (getline(is, ligne, '\n'))
+                {
+                    istringstream is2(ligne);
+                
+                    string id, employee_id, book_id, date;
+                    getline(is2, id, ';'); //ignore l'id
+                    getline(is2, employee_id, ';'); //ignore l'employee_id
+                    getline(is2, book_id, ';');
+                    getline(is2, date, '\n'); //ignore la date
+
+                    string allBooks;
+                    requette = "GET_BOOKBYID#"+book_id;
+                    if(OBEP_Op((char*)requette.c_str(),allBooks)==0)
+                    {
+                        istringstream is3(allBooks);
+                        string ligne;
+                        string id, author, subject, title, isbn, pageCount, publishYear, price, stockQuantity;
+                        
+                        while (getline(is3, ligne, '\n'))
+                        {
+                            istringstream is4(ligne);
+                            string id, titre, auteur, sujet, isbn, pages, annee, prix, stock;
+                            getline(is4, id, ';');
+                            getline(is4, titre, ';');
+                            getline(is4, auteur, ';');
+                            getline(is4, sujet, ';');
+                            getline(is4, isbn, ';');
+                            getline(is4, pages, ';');
+                            getline(is4, annee, ';');
+                            getline(is4, prix, ';');
+                            getline(is4, stock, '\n');
+
+                            addTupleTableBooks(IdBook,titre,auteur,sujet,isbn,stoi(pages),stoi(annee),stof(prix),stoi(stock));
+                            IdBook++;
+
+                        }
+                        
+                    }
+                    else
+                    {
+                        dialogError("Erreur",allBooks);
+                    
+                    }
+                }
+                
+            }
+            else
+            {
+                dialogError("Erreur",encodedBooksId);
+            }
+        }*/
     }
     else
     {
@@ -492,6 +587,9 @@ void MainWindowClientBookEncoder::on_actionLogout_triggered() {
     {
         this->dialogMessage("Logout",resultat);
         this->logoutOk();
+        //delete liste des livres
+        this->clearTableBooks();
+
         printf("Code retour: %d\n Resultat Message: %s\n", res,resultat.c_str());
     }
     else
@@ -507,15 +605,15 @@ void MainWindowClientBookEncoder::on_actionQuitter_triggered()
     string resultat;
     string requette = "LOGOUT#";
     int res=OBEP_Op((char*)requette.c_str(),resultat);
-    if(res<0)
-    {
-        this->dialogError("Erreur",resultat);
-    }
-    else
+    if(res==0)
     {
         this->dialogMessage("Succès",resultat);
         ::close(sClient);
         QApplication::exit(0);
+    }
+    else
+    {
+        this->dialogError("Erreur",resultat);
     }
 }
 
@@ -730,7 +828,11 @@ int Echange(char *requete, char *reponse)
         close(sClient);
         return -3;
     }
-    reponse[nbLus] = 0; 
+    //reponse[nbLus] = 0;
+    if(reponse[nbLus-1] != '\0')
+    {
+        reponse[nbLus] = '\0';
+    }
 
     return 0;
 }
