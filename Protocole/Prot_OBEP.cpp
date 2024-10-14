@@ -807,3 +807,172 @@ bool OBEP_Parser(string requete, string& reponse, int socketClient)
     }
     
 }
+
+int OBEP_OpClient(char* requete, string& resultat, int sClient)
+{
+    char reponse[4048];
+    int res;
+    // *****Envoi requete + réception réponse **************
+    res=Echange(requete, reponse, sClient);
+    if(res<0)
+    {
+        return -1;
+    }
+    else
+    {
+        // *****Parsing de la réponse **************************
+        istringstream is(reponse);
+        string TypeRequete;
+
+        getline(is, TypeRequete, '_'); // skip le type (add, get)
+        if(TypeRequete == "ADD")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+
+            string status;
+            string message;
+            getline(is, status, '#');//recupere le status de la requete
+            getline(is, message, '\n'); //recupere le message de la requete
+            resultat = message;
+            if(status == "OK")
+            {
+                
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        else if(TypeRequete == "GET")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject, Book)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages + '\n';
+                while (getline(is, messages, '\n'))
+                {
+                    resultat += messages;
+                    resultat += '\n';
+                }
+                
+            }
+            else
+            {
+                
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+        else if(TypeRequete=="GETID")
+        {
+            getline(is, TypeRequete, '#');//skip le type (Author, Subject)
+            string status;
+            string messages;
+            getline(is, status, '\n');//recupere le status de la requete
+            getline(is, messages, '\n'); //recupere le message de la requete
+            if(status == "OK")
+            {
+                resultat = messages;
+            }
+            else
+            {
+                istringstream is(status);
+                getline(is, status, '#');//ignore le status
+
+                getline(is, messages, '\n'); //recupere le message de la requete
+                resultat = messages;
+                return -1;
+            }
+        }
+        else
+        {
+            istringstream is(reponse);
+            string TypeRequete;
+            getline(is, TypeRequete, '#'); // skip le type (Author, Subject, Book)
+            
+            if(TypeRequete == "LOGIN")
+            {
+                string status;
+                getline(is, status, '#');
+                string message;
+                getline(is, message, '\n');
+                resultat=message;
+                if(status == "OK")
+                {
+                
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else if(TypeRequete == "LOGOUT")
+            {
+                string status;
+                getline(is, status, '#');
+                string message;
+                getline(is, message, '\n');
+                resultat=message;
+                if(status == "OK")
+                {
+                
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
+
+    }
+
+    printf("Reponse OBEP(return 0): %s\n", resultat.c_str());
+
+    return 0;
+}
+//***** Echange de données entre client et serveur ******************
+int Echange(char *requete, char *reponse, int serviceSocket)
+{
+    int nbEcrits, nbLus;
+    // ***** Envoi de la requete ****************************
+    //teste si la requete a le caractere de fin de chaine, si il a pas, il le rajoute
+    if(requete[strlen(requete)-1] != '\0')
+    {
+        strcat(requete, "\0");
+    }
+
+    if ((nbEcrits = SendSocket(serviceSocket, requete, strlen(requete))) == -1)
+    {
+        perror("Erreur de Send");
+        close(serviceSocket);
+        return -1;
+    }
+    // ***** Attente de la reponse **************************
+    if ((nbLus = ReceiveSocket(serviceSocket, reponse)) < 0)
+    {
+        perror("Erreur de Receive");
+        close(serviceSocket);
+        return -2;
+    }
+    if (nbLus == 0)
+    {
+        printf("Serveur arrete, pas de reponse reçue...\n");
+        close(serviceSocket);
+        return -3;
+    }
+    //reponse[nbLus] = 0;
+    if(reponse[nbLus-1] != '\0')
+    {
+        reponse[nbLus] = '\0';
+    }
+
+    return 0;
+}

@@ -37,6 +37,15 @@ void read_config()
         //exit(1);
         PORT_ENCODING= 50000;
         NB_THREADS= 2;
+        // cree le fichier de configuration et met dans le fichier la configuration par defaut
+        file = fopen(CONFIG_FILE, "w");
+        if (file == NULL) {
+            perror("Erreur de creation du fichier de configuration");
+            exit(1);
+        }
+        fprintf(file, "PORT_ENCODING=%d\n", PORT_ENCODING);
+        fprintf(file, "NB_THREADS=%d\n", NB_THREADS);
+        fclose(file);
         return;
     }
 
@@ -129,43 +138,6 @@ void HandlerSIGINT(int s) {
     exit(0);
 }
 
-/*void TraitementConnexion(int sService) {
-    //char reponse[4048], requete[4048];
-    string reponse , requete;
-    int nbLus, nbEcrits;
-    bool onContinue = true;
-    while (onContinue) 
-    {
-        printf("\t[THREAD %p] Attente requete...\n", pthread_self());
-        // ***** Reception Requete ******************
-        if ((nbLus = ReceiveSocket(sService, requete)) <= 0) 
-        {   
-            // ***** Fin de connexion ? *****************
-            if (nbLus < 0) perror("Erreur de Receive");
-            printf("\t[THREAD %p] Fin de connexion du client averc la socket %d\n", pthread_self(), sService);
-            close(sService);
-            return;
-        }
-        //requete[nbLus] = 0; 
-        //printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
-        printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete.c_str());
-        // ***** Traitement de la requete ***********
-        onContinue = OBEP_Parser(requete, reponse, sService);
-        // ***** Envoi de la reponse ****************
-        if ((nbEcrits = SendSocket(sService, reponse)) == -1){
-            perror("Erreur de Send");
-            close(sService);
-            return;
-        }
-        //printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse);
-        printf("\t[THREAD %p] Reponse envoyee = %s\n", pthread_self(), reponse.c_str());
-
-        //if (!onContinue)
-        //    printf("\t[THREAD %p] Fin de connexion de la socket %d\n", pthread_self(), sService);
-    }
-    close(sService);
-}*/
-
 //en char
 void TraitementConnexion(int sService)
 {
@@ -190,7 +162,7 @@ void TraitementConnexion(int sService)
             requete[nbLus] = '\0';
         }
         
-        requete[nbLus] = 0;
+        //requete[nbLus] = 0;
         printf("\t[THREAD %p] Requete recue = %s\n", pthread_self(), requete);
         // ***** Traitement de la requete ***********
         onContinue = OBEP_Parser(requete, reponse, sService);
